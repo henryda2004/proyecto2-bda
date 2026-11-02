@@ -1,0 +1,21 @@
+{
+  "fecha_hora_utc": "2026-11-02T21:29:28.624866+00:00",
+  "objetivo": "Mostrar que el registro no consulta Valkey, que solo el registro tiene configuracion de MongoDB y que puertos se publican",
+  "comando": "python proyecto2/pruebas/p1_aislamiento_registro.py",
+  "revision_codigo_registro": {
+    "patron": "valkey|redis (sin distinguir mayusculas)",
+    "carpeta": "proyecto2/servicios/registro",
+    "coincidencias": []
+  },
+  "servicios_con_configuracion_de_mongodb": [
+    "registro"
+  ],
+  "puertos_publicados_docker_compose_base": {},
+  "puertos_publicados_con_docker_compose_dev": {
+    "registro": [
+      "127.0.0.1:8001->8000"
+    ]
+  },
+  "criterio": "sin menciones a Valkey, solo registro con configuracion de MongoDB, y en el compose base solo el gateway publica puertos",
+  "prueba_superada": true
+}
