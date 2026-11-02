@@ -82,3 +82,10 @@ Si `siguiente` no es `null`, se pasa como `despues` para pedir la página siguie
 ## Eventos
 
 Cada respuesta con `evento` trae la fila lista para el histórico, con los campos definidos en `00-contrato-eventos.md`.
+
+
+## Decisiones de diseño
+
+La liberación de una tarea no genera evento. Los estados que admite una fila de Parquet son abierta, anotada, en_revision, aprobada y rechazada, y una tarea liberada queda en disponible, que no es uno de ellos. Tampoco aparece entre las transiciones que el enunciado lista como generadoras de fila.
+
+El plazo `vence_en` no se renueva. El registro no consulta Valkey y las rutas están limitadas a seis, así que el gateway debe enviar `plazo_seg` igual al tiempo de vida del lock de sesión. Si una tarea se reasigna mientras el anotador anterior sigue editando, el envío de ese anotador recibe 409, porque cada asignación genera un token nuevo.
