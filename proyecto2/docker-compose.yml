@@ -46,6 +46,22 @@ services:
       retries: 5
     restart: unless-stopped
 
+  registro:
+    build: ./servicios/registro
+    container_name: registro
+    environment:
+      MONGO_URI: mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0
+    depends_on:
+      mongo1:
+        condition: service_healthy
+      mongo2:
+        condition: service_healthy
+      mongo3:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: unless-stopped
+
 networks:
   backend:
 
