@@ -117,13 +117,22 @@ async def mongo_no_responde(request, exc):
 @app.get("/salud")
 def salud():
     try:
-        client.admin.command("ping")
-        return {"servicio": "registro", "estado": "operativo"}
+        estado_rs = client.admin.command("replSetGetStatus")
+        miembros = estado_rs["members"]
+        sanos = sum(1 for m in miembros if m.get("health") == 1)
+        hay_primario = any(m.get("stateStr") == "PRIMARY" for m in miembros)
     except Exception:
         return JSONResponse(
             status_code=503,
-            content={"servicio": "registro", "estado": "caido"},
+            content={"servicio": "registro", "estado": "caido", "nodos_sanos": 0, "nodos_total": 3},
         )
+    cuerpo = {"servicio": "registro", "estado": "operativo", "nodos_sanos": sanos, "nodos_total": 3}
+    if not hay_primario or sanos < 2:
+        cuerpo["estado"] = "caido"
+        return JSONResponse(status_code=503, content=cuerpo)
+    if sanos < 3:
+        cuerpo["estado"] = "degradado"
+    return cuerpo
 
 
 @app.post("/proyectos", status_code=201)

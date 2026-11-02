@@ -1,0 +1,208 @@
+{
+  "fecha_hora_utc": "2026-11-02T21:26:43.305509+00:00",
+  "objetivo": "Comprobar que /salud del registro distingue los estados operativo, degradado y caido",
+  "configuracion": {
+    "url": "http://127.0.0.1:8001",
+    "falla": "docker stop -t 0"
+  },
+  "comando": "python proyecto2/pruebas/p1_salud_registro.py",
+  "roles_antes": [
+    {
+      "nombre": "mongo1",
+      "estado": "SECONDARY"
+    },
+    {
+      "nombre": "mongo2",
+      "estado": "PRIMARY"
+    },
+    {
+      "nombre": "mongo3",
+      "estado": "SECONDARY"
+    }
+  ],
+  "fases": [
+    {
+      "fase": "normal",
+      "esperado": {
+        "estado": "operativo",
+        "http": 200
+      },
+      "nodos_detenidos": [],
+      "acciones": [],
+      "observaciones": [
+        {
+          "hora_utc": "2026-11-02T21:26:45.505320+00:00",
+          "http": 200,
+          "respuesta": {
+            "servicio": "registro",
+            "estado": "operativo",
+            "nodos_sanos": 3,
+            "nodos_total": 3
+          },
+          "ms": 30.6
+        },
+        {
+          "hora_utc": "2026-11-02T21:26:46.518515+00:00",
+          "http": 200,
+          "respuesta": {
+            "servicio": "registro",
+            "estado": "operativo",
+            "nodos_sanos": 3,
+            "nodos_total": 3
+          },
+          "ms": 12.8
+        },
+        {
+          "hora_utc": "2026-11-02T21:26:47.534678+00:00",
+          "http": 200,
+          "respuesta": {
+            "servicio": "registro",
+            "estado": "operativo",
+            "nodos_sanos": 3,
+            "nodos_total": 3
+          },
+          "ms": 15.5
+        }
+      ],
+      "superado": true
+    },
+    {
+      "fase": "degradado",
+      "esperado": {
+        "estado": "degradado",
+        "http": 200
+      },
+      "nodos_detenidos": [
+        "mongo1"
+      ],
+      "acciones": [
+        {
+          "hora_utc": "2026-11-02T21:26:48.782153+00:00",
+          "accion": "docker stop -t 0 mongo1"
+        }
+      ],
+      "observaciones": [
+        {
+          "hora_utc": "2026-11-02T21:27:00.786695+00:00",
+          "http": 200,
+          "respuesta": {
+            "servicio": "registro",
+            "estado": "degradado",
+            "nodos_sanos": 2,
+            "nodos_total": 3
+          },
+          "ms": 4.3
+        },
+        {
+          "hora_utc": "2026-11-02T21:27:01.790665+00:00",
+          "http": 200,
+          "respuesta": {
+            "servicio": "registro",
+            "estado": "degradado",
+            "nodos_sanos": 2,
+            "nodos_total": 3
+          },
+          "ms": 3.8
+        },
+        {
+          "hora_utc": "2026-11-02T21:27:02.794949+00:00",
+          "http": 200,
+          "respuesta": {
+            "servicio": "registro",
+            "estado": "degradado",
+            "nodos_sanos": 2,
+            "nodos_total": 3
+          },
+          "ms": 3.5
+        }
+      ],
+      "superado": true
+    },
+    {
+      "fase": "caido",
+      "esperado": {
+        "estado": "caido",
+        "http": 503
+      },
+      "nodos_detenidos": [
+        "mongo1",
+        "mongo3"
+      ],
+      "acciones": [
+        {
+          "hora_utc": "2026-11-02T21:27:04.866626+00:00",
+          "accion": "docker stop -t 0 mongo1"
+        },
+        {
+          "hora_utc": "2026-11-02T21:27:06.965601+00:00",
+          "accion": "docker stop -t 0 mongo3"
+        }
+      ],
+      "observaciones": [
+        {
+          "hora_utc": "2026-11-02T21:27:24.443153+00:00",
+          "http": 503,
+          "respuesta": {
+            "servicio": "registro",
+            "estado": "caido",
+            "nodos_sanos": 0,
+            "nodos_total": 3
+          },
+          "ms": 2476.9
+        },
+        {
+          "hora_utc": "2026-11-02T21:27:27.853211+00:00",
+          "http": 503,
+          "respuesta": {
+            "servicio": "registro",
+            "estado": "caido",
+            "nodos_sanos": 0,
+            "nodos_total": 3
+          },
+          "ms": 2409.7
+        },
+        {
+          "hora_utc": "2026-11-02T21:27:31.292606+00:00",
+          "http": 503,
+          "respuesta": {
+            "servicio": "registro",
+            "estado": "caido",
+            "nodos_sanos": 0,
+            "nodos_total": 3
+          },
+          "ms": 2439.2
+        }
+      ],
+      "superado": true
+    }
+  ],
+  "recuperacion": {
+    "acciones": [
+      {
+        "hora_utc": "2026-11-02T21:27:32.496629+00:00",
+        "accion": "docker start mongo1"
+      },
+      {
+        "hora_utc": "2026-11-02T21:27:32.560405+00:00",
+        "accion": "docker start mongo2"
+      },
+      {
+        "hora_utc": "2026-11-02T21:27:32.778093+00:00",
+        "accion": "docker start mongo3"
+      }
+    ],
+    "segundos_hasta_replica_set_sano": 3.06,
+    "salud_despues": {
+      "hora_utc": "2026-11-02T21:27:35.837617+00:00",
+      "http": 200,
+      "respuesta": {
+        "servicio": "registro",
+        "estado": "operativo",
+        "nodos_sanos": 3,
+        "nodos_total": 3
+      },
+      "ms": 3.1
+    }
+  },
+  "prueba_superada": true
+}

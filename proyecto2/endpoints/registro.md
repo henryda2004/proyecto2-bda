@@ -15,7 +15,21 @@ Son seis rutas, el máximo permitido por servicio. Todos los cuerpos son JSON. L
 
 ## GET /salud
 
-Responde `200` con `{"servicio": "registro", "estado": "operativo"}`.
+Consulta el estado del replica set de MongoDB y responde con `servicio`, `estado`, `nodos_sanos` y `nodos_total`.
+
+| Estado | HTTP | Cuándo |
+| --- | --- | --- |
+| operativo | 200 | Los tres nodos están sanos |
+| degradado | 200 | Hay primario y dos nodos sanos, todavía se puede escribir con mayoría |
+| caido | 503 | No hay primario, queda menos de dos nodos sanos o no hay conexión. En ese caso `nodos_sanos` es 0 porque no se puede leer el estado |
+
+Ejemplo en estado normal.
+
+```json
+{"servicio": "registro", "estado": "operativo", "nodos_sanos": 3, "nodos_total": 3}
+```
+
+Las respuestas de los tres estados están en `evidence/p1-salud-registro.json`.
 
 ## POST /proyectos
 
