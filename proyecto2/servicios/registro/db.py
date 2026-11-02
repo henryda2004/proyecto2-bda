@@ -10,6 +10,7 @@ MONGO_URI = os.environ.get(
 client = MongoClient(
     MONGO_URI,
     w="majority",
+    wTimeoutMS=3000,
     tz_aware=True,
     serverSelectionTimeoutMS=2000,
 )
