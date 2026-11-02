@@ -1,0 +1,5 @@
+﻿Date: 2026-11-02T13:50:52
+OS: Microsoft Windows 11 Home 10.0.26300
+CPU: AMD Ryzen 9 5980HX with Radeon Graphics         | cores: 8 | logical processors: 16
+RAM total (GB): 63.4
+Docker: CPUs=16 MemTotal=33338048512 bytes ServerVersion=29.5.3

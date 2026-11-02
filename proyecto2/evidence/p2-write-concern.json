@@ -1,0 +1,21 @@
+﻿{
+  "executed_at": "2026-11-02T19:47:44.069Z",
+  "results": [
+    {
+      "write_concern": "w1",
+      "samples": 1000,
+      "mean_ms": 1.117,
+      "p50_ms": 0.997,
+      "p95_ms": 1.794,
+      "p99_ms": 2.404
+    },
+    {
+      "write_concern": "majority",
+      "samples": 1000,
+      "mean_ms": 2.677,
+      "p50_ms": 2.507,
+      "p95_ms": 3.39,
+      "p99_ms": 4.213
+    }
+  ]
+}
