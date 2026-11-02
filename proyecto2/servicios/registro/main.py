@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from pymongo.errors import PyMongoError
@@ -354,4 +354,42 @@ def transicion(tarea_id: str, datos: TransicionIn):
         "estado": regla["hacia"],
         "version": nueva_version,
         "evento": evento,
+    }
+
+@app.get("/proyectos/{proyecto_id}/exportar")
+def exportar(
+    proyecto_id: str,
+    limite: int = Query(default=100, ge=1, le=1000),
+    despues: str | None = None,
+):
+    if db.proyectos.count_documents({"_id": proyecto_id}, limit=1) == 0:
+        raise HTTPException(status_code=404, detail="El proyecto no existe")
+
+    filtro = {"proyecto_id": proyecto_id, "estado": "aprobada"}
+    if despues:
+        filtro["_id"] = {"$gt": despues}
+
+    docs = list(db.tareas.find(filtro).sort("_id", 1).limit(limite + 1))
+    hay_mas = len(docs) > limite
+    docs = docs[:limite]
+
+    return {
+        "tareas": [
+            {
+                "id": t["_id"],
+                "uri": t["uri"],
+                "sha256": t["sha256"],
+                "bytes": t["bytes"],
+                "mime": t["mime"],
+                "meta": t["meta"],
+                "modalidad": t["modalidad"],
+                "tipo_tarea": t["tipo_tarea"],
+                "anotacion": t["anotacion"]["datos"],
+                "revisado_por": t["ultima_revision"]["revisor_id"],
+                "aprobada_en": t["ultima_revision"]["fecha"],
+            }
+            for t in docs
+        ],
+        "limite": limite,
+        "siguiente": docs[-1]["_id"] if hay_mas else None,
     }
