@@ -1,5 +1,5 @@
 {
-  "fecha_hora_utc": "2026-11-02T20:34:44.255416+00:00",
+  "fecha_hora_utc": "2026-11-02T20:50:25.527891+00:00",
   "objetivo": "Verificar que no hay doble asignacion con 50 solicitudes simultaneas y 10 tareas libres",
   "configuracion": {
     "url": "http://127.0.0.1:8001",
@@ -34,314 +34,317 @@
         "n": 10
       }
     ],
+    "envio_con_token_incorrecto": 409,
+    "primer_envio": 200,
+    "segundo_envio": 409,
     "prueba_superada": true
   },
   "latencia_ms": {
     "muestras": 50,
-    "p50": 167.262,
-    "p95": 232.302,
-    "p99": 234.293
+    "p50": 132.896,
+    "p95": 198.32,
+    "p99": 201.588
   },
   "detalle": [
     {
       "anotador": "p2-ana-001",
       "http": 204,
       "tarea": null,
-      "ms": 142.93319999706
+      "ms": 120.08909997530282
     },
     {
       "anotador": "p2-ana-002",
       "http": 200,
-      "tarea": "5caa41b4-891f-4e2d-a573-3709918726c3",
-      "ms": 110.7287000049837
+      "tarea": "c3a6e2d7-1818-4ef1-80f8-3bcf28999d8b",
+      "ms": 78.56179994996637
     },
     {
       "anotador": "p2-ana-003",
       "http": 204,
       "tarea": null,
-      "ms": 172.5655000191182
+      "ms": 164.39140000147745
     },
     {
       "anotador": "p2-ana-004",
       "http": 204,
       "tarea": null,
-      "ms": 139.37359995907173
+      "ms": 106.12690000561997
     },
     {
       "anotador": "p2-ana-005",
-      "http": 204,
-      "tarea": null,
-      "ms": 228.98229997372255
+      "http": 200,
+      "tarea": "b6f4df0e-5b84-4ee7-854c-111645bf05ea",
+      "ms": 97.62539999792352
     },
     {
       "anotador": "p2-ana-006",
       "http": 204,
       "tarea": null,
-      "ms": 156.8334000185132
+      "ms": 180.3467000136152
     },
     {
       "anotador": "p2-ana-007",
       "http": 204,
       "tarea": null,
-      "ms": 169.41259999293834
+      "ms": 108.12319995602593
     },
     {
       "anotador": "p2-ana-008",
       "http": 204,
       "tarea": null,
-      "ms": 181.21100001735613
+      "ms": 186.6437999997288
     },
     {
       "anotador": "p2-ana-009",
       "http": 204,
       "tarea": null,
-      "ms": 138.1880000117235
+      "ms": 123.48650000058115
     },
     {
       "anotador": "p2-ana-010",
-      "http": 200,
-      "tarea": "2f338d5e-97ee-4ce6-b30d-a3208d9507bc",
-      "ms": 133.04419995984063
+      "http": 204,
+      "tarea": null,
+      "ms": 112.16269998112693
     },
     {
       "anotador": "p2-ana-011",
       "http": 204,
       "tarea": null,
-      "ms": 157.45020000031218
+      "ms": 112.66759998397902
     },
     {
       "anotador": "p2-ana-012",
       "http": 204,
       "tarea": null,
-      "ms": 183.02050000056624
+      "ms": 122.35259998124093
     },
     {
       "anotador": "p2-ana-013",
-      "http": 200,
-      "tarea": "1f2dc886-c683-490f-9b3c-636f6c21fdf9",
-      "ms": 137.57449999684468
+      "http": 204,
+      "tarea": null,
+      "ms": 112.24950000178069
     },
     {
       "anotador": "p2-ana-014",
       "http": 204,
       "tarea": null,
-      "ms": 191.36830000206828
+      "ms": 127.22439999924973
     },
     {
       "anotador": "p2-ana-015",
       "http": 204,
       "tarea": null,
-      "ms": 177.86479997448623
+      "ms": 136.8328999960795
     },
     {
       "anotador": "p2-ana-016",
       "http": 204,
       "tarea": null,
-      "ms": 229.6519000083208
+      "ms": 132.89569999324158
     },
     {
       "anotador": "p2-ana-017",
       "http": 204,
       "tarea": null,
-      "ms": 154.90710001904517
+      "ms": 179.77139999857172
     },
     {
       "anotador": "p2-ana-018",
-      "http": 204,
-      "tarea": null,
-      "ms": 210.13760002097115
+      "http": 200,
+      "tarea": "234d68d1-9f47-476a-aeb2-dba38f91831f",
+      "ms": 69.11609997041523
     },
     {
       "anotador": "p2-ana-019",
-      "http": 204,
-      "tarea": null,
-      "ms": 153.17929995944723
+      "http": 200,
+      "tarea": "3aa62113-7c88-4076-bab4-ec3b3f593a4a",
+      "ms": 115.89549999916926
     },
     {
       "anotador": "p2-ana-020",
       "http": 204,
       "tarea": null,
-      "ms": 234.20939996140078
+      "ms": 150.18359996611252
     },
     {
       "anotador": "p2-ana-021",
       "http": 204,
       "tarea": null,
-      "ms": 230.2421000204049
+      "ms": 163.23279996868223
     },
     {
       "anotador": "p2-ana-022",
       "http": 204,
       "tarea": null,
-      "ms": 226.14169999724254
+      "ms": 171.2985000340268
     },
     {
       "anotador": "p2-ana-023",
-      "http": 200,
-      "tarea": "4c417a75-1dc9-451a-a67c-f690b5c4306e",
-      "ms": 104.92189996875823
+      "http": 204,
+      "tarea": null,
+      "ms": 185.83159998524934
     },
     {
       "anotador": "p2-ana-024",
-      "http": 204,
-      "tarea": null,
-      "ms": 232.30199998943135
+      "http": 200,
+      "tarea": "db5d2fb3-fdc2-4982-8e82-c46191a5ff4e",
+      "ms": 87.34490000642836
     },
     {
       "anotador": "p2-ana-025",
-      "http": 200,
-      "tarea": "d553b3fb-b3a0-4d24-a18a-78fb89bd809c",
-      "ms": 110.05409999052063
+      "http": 204,
+      "tarea": null,
+      "ms": 188.7853000080213
     },
     {
       "anotador": "p2-ana-026",
       "http": 204,
       "tarea": null,
-      "ms": 165.5224999994971
+      "ms": 149.05850001377985
     },
     {
       "anotador": "p2-ana-027",
-      "http": 204,
-      "tarea": null,
-      "ms": 139.16230003815144
+      "http": 200,
+      "tarea": "f89b153f-5bf1-4a84-b01f-c2e413622645",
+      "ms": 104.08030002145097
     },
     {
       "anotador": "p2-ana-028",
       "http": 204,
       "tarea": null,
-      "ms": 234.29299995768815
+      "ms": 133.39360000099987
     },
     {
       "anotador": "p2-ana-029",
       "http": 200,
-      "tarea": "4099d6c2-0ad7-489f-8110-30c672c686ff",
-      "ms": 110.35410000476986
+      "tarea": "0d21db69-937b-4845-8b4c-05f29368ad1b",
+      "ms": 82.87049998762086
     },
     {
       "anotador": "p2-ana-030",
-      "http": 200,
-      "tarea": "898dd74a-833d-4f74-bc02-cae095a20ee5",
-      "ms": 113.17079997388646
+      "http": 204,
+      "tarea": null,
+      "ms": 191.28909998107702
     },
     {
       "anotador": "p2-ana-031",
       "http": 204,
       "tarea": null,
-      "ms": 170.5352999852039
+      "ms": 201.58759999321774
     },
     {
       "anotador": "p2-ana-032",
       "http": 204,
       "tarea": null,
-      "ms": 206.7141000297852
+      "ms": 176.37649999232963
     },
     {
       "anotador": "p2-ana-033",
       "http": 204,
       "tarea": null,
-      "ms": 167.26200003176928
+      "ms": 122.94470000779256
     },
     {
       "anotador": "p2-ana-034",
-      "http": 200,
-      "tarea": "0f67ad30-fe42-4294-a9de-5671094bb3c6",
-      "ms": 135.3188999928534
+      "http": 204,
+      "tarea": null,
+      "ms": 116.27550004050136
     },
     {
       "anotador": "p2-ana-035",
       "http": 204,
       "tarea": null,
-      "ms": 212.3569999821484
+      "ms": 162.4938999884762
     },
     {
       "anotador": "p2-ana-036",
-      "http": 200,
-      "tarea": "94f00e09-46fc-4448-a0ed-0129f08698f6",
-      "ms": 129.19169996166602
+      "http": 204,
+      "tarea": null,
+      "ms": 155.49559995997697
     },
     {
       "anotador": "p2-ana-037",
       "http": 204,
       "tarea": null,
-      "ms": 138.7776000192389
+      "ms": 162.07580000627786
     },
     {
       "anotador": "p2-ana-038",
       "http": 204,
       "tarea": null,
-      "ms": 135.41619997704402
+      "ms": 169.81180000584573
     },
     {
       "anotador": "p2-ana-039",
       "http": 204,
       "tarea": null,
-      "ms": 229.91940000792965
+      "ms": 194.53320000320673
     },
     {
       "anotador": "p2-ana-040",
       "http": 204,
       "tarea": null,
-      "ms": 193.4900000342168
+      "ms": 198.57059995410964
     },
     {
       "anotador": "p2-ana-041",
       "http": 204,
       "tarea": null,
-      "ms": 216.9937999569811
+      "ms": 93.57970004202798
     },
     {
       "anotador": "p2-ana-042",
       "http": 204,
       "tarea": null,
-      "ms": 201.04020001599565
+      "ms": 184.49580000014976
     },
     {
       "anotador": "p2-ana-043",
-      "http": 204,
-      "tarea": null,
-      "ms": 194.04849997954443
+      "http": 200,
+      "tarea": "4e661e92-3759-4729-8392-e09d2f00a077",
+      "ms": 48.523299978114665
     },
     {
       "anotador": "p2-ana-044",
-      "http": 200,
-      "tarea": "bf55c187-20a7-4fdf-998f-9f0aebed8313",
-      "ms": 134.6969999722205
+      "http": 204,
+      "tarea": null,
+      "ms": 113.04130003554747
     },
     {
       "anotador": "p2-ana-045",
-      "http": 204,
-      "tarea": null,
-      "ms": 215.72369994828478
+      "http": 200,
+      "tarea": "ffe24a1e-07ec-4edd-9fd2-8cad15be6936",
+      "ms": 69.19979996746406
     },
     {
       "anotador": "p2-ana-046",
       "http": 204,
       "tarea": null,
-      "ms": 208.9191999984905
+      "ms": 121.15279998397455
     },
     {
       "anotador": "p2-ana-047",
       "http": 204,
       "tarea": null,
-      "ms": 169.50469999574125
+      "ms": 149.5297000510618
     },
     {
       "anotador": "p2-ana-048",
       "http": 204,
       "tarea": null,
-      "ms": 132.72009999491274
+      "ms": 198.32029996905476
     },
     {
       "anotador": "p2-ana-049",
       "http": 204,
       "tarea": null,
-      "ms": 157.043999992311
+      "ms": 148.55979999992996
     },
     {
       "anotador": "p2-ana-050",
-      "http": 204,
-      "tarea": null,
-      "ms": 152.17729995492846
+      "http": 200,
+      "tarea": "e87fc370-04fa-499d-ab38-9daf8e9125be",
+      "ms": 90.95370001159608
     }
   ]
 }

@@ -55,6 +55,7 @@ def pedir(url, anotador, proyecto_id, barrera):
         "anotador": anotador,
         "http": estado,
         "tarea": cuerpo["tarea"]["id"] if cuerpo else None,
+        "token": cuerpo["token"] if cuerpo else None,
         "ms": (time.perf_counter() - t0) * 1000,
     }
 
@@ -142,12 +143,28 @@ def main():
     )
     abiertas_mongo = sum(x["n"] for x in en_mongo if x["_id"] == "abierta")
 
+    # Envio de una tarea asignada y segundo envio (debe responder 409)
+    primera = asignadas[0]
+    url_t = f"{args.url}/tareas/{primera['tarea']}/transicion"
+    cuerpo_envio = {
+        "accion": "enviar",
+        "anotador_id": primera["anotador"],
+        "token": primera["token"],
+        "anotacion": {"cuboides": [{"x": 1, "y": 2, "z": 3, "etiqueta": "lidar#peaton"}]},
+    }
+    envio_token_malo, _ = http_post(url_t, {**cuerpo_envio, "token": "token-incorrecto"})
+    primer_envio, _ = http_post(url_t, cuerpo_envio)
+    segundo_envio, _ = http_post(url_t, cuerpo_envio)
+
     ok = (
         len(asignadas) == TAREAS_LIBRES
         and len(sin_tarea) == SOLICITUDES - TAREAS_LIBRES
         and not otras
         and duplicadas == 0
         and abiertas_mongo == TAREAS_LIBRES
+        and envio_token_malo == 409
+        and primer_envio == 200
+        and segundo_envio == 409
     )
 
     latencias = [r["ms"] for r in resultados]
@@ -169,6 +186,9 @@ def main():
             "tareas_duplicadas": duplicadas,
             "tareas_abiertas_en_mongo": abiertas_mongo,
             "estados_en_mongo": en_mongo,
+            "envio_con_token_incorrecto": envio_token_malo,
+            "primer_envio": primer_envio,
+            "segundo_envio": segundo_envio,
             "prueba_superada": ok,
         },
         "latencia_ms": {
@@ -177,7 +197,7 @@ def main():
             "p95": percentil(latencias, 95),
             "p99": percentil(latencias, 99),
         },
-        "detalle": resultados,
+        "detalle": [{k: v for k, v in r.items() if k != "token"} for r in resultados],
     }
 
     destino = Path(__file__).resolve().parent.parent / "evidence" / "p2-concurrencia.json"
