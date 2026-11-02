@@ -1,0 +1,293 @@
+{
+  "fecha_hora_utc": "2026-11-02T21:06:33.526039+00:00",
+  "objetivo": "Comprobar el comportamiento del registro ante la caida de nodos de MongoDB, medir el RTO y verificar que lo confirmado con HTTP 200 no se pierde (RPO)",
+  "configuracion": {
+    "url": "http://127.0.0.1:8001",
+    "write_concern": "majority con wTimeoutMS 3000",
+    "escritura": "POST /tareas/siguiente cada 0.1 s",
+    "falla": "docker stop -t 0",
+    "segundos_base": 5,
+    "tareas_por_escenario": 1200,
+    "definicion_rto": "pausa maxima entre dos respuestas HTTP 200 consecutivas"
+  },
+  "comando": "python proyecto2/pruebas/p8_fallas_mongo.py",
+  "escenarios": [
+    {
+      "escenario": "A_cae_un_secundario",
+      "descripcion": "Se detiene un nodo secundario",
+      "roles_antes": [
+        {
+          "nombre": "mongo1",
+          "estado": "PRIMARY"
+        },
+        {
+          "nombre": "mongo2",
+          "estado": "SECONDARY"
+        },
+        {
+          "nombre": "mongo3",
+          "estado": "SECONDARY"
+        }
+      ],
+      "nodos_detenidos": [
+        "mongo2"
+      ],
+      "acciones": [
+        {
+          "hora_utc": "2026-11-02T21:06:44.451487+00:00",
+          "accion": "docker stop -t 0 mongo2"
+        },
+        {
+          "hora_utc": "2026-11-02T21:07:00.733910+00:00",
+          "accion": "docker start mongo2"
+        }
+      ],
+      "roles_durante_la_falla": [
+        {
+          "nombre": "mongo1",
+          "estado": "PRIMARY"
+        },
+        {
+          "nombre": "mongo2",
+          "estado": "(not reachable/healthy)"
+        },
+        {
+          "nombre": "mongo3",
+          "estado": "SECONDARY"
+        }
+      ],
+      "roles_despues": [
+        {
+          "nombre": "mongo1",
+          "estado": "PRIMARY"
+        },
+        {
+          "nombre": "mongo2",
+          "estado": "SECONDARY"
+        },
+        {
+          "nombre": "mongo3",
+          "estado": "SECONDARY"
+        }
+      ],
+      "ventana_falla_s": 15,
+      "segundos_hasta_replica_set_sano": 3.7,
+      "nuevo_primario_elegido": false,
+      "durante_la_falla": {
+        "intentos": 128,
+        "http_200": 128,
+        "http_503": 0,
+        "otros": 0,
+        "codigos": {
+          "200": 128
+        }
+      },
+      "rto_pausa_maxima_entre_200_s": 0.15,
+      "pausa_tipica_entre_200_s": 0.125,
+      "recuperacion_tras_restaurar_s": 0.05,
+      "intentos_sin_tareas_http_204": 0,
+      "rpo": {
+        "confirmadas_http_200": 244,
+        "confirmadas_ausentes_en_mongo": 0,
+        "duplicadas": 0,
+        "abiertas_en_mongo_sin_respuesta_200": 0
+      },
+      "latencia_ms_http_200": {
+        "muestras": 244,
+        "p50": 24.446,
+        "p95": 39.259,
+        "p99": 45.871,
+        "max": 52.12
+      },
+      "superado": true
+    },
+    {
+      "escenario": "B_cae_el_primario",
+      "descripcion": "Se detiene el nodo primario y se elige otro",
+      "roles_antes": [
+        {
+          "nombre": "mongo1",
+          "estado": "PRIMARY"
+        },
+        {
+          "nombre": "mongo2",
+          "estado": "SECONDARY"
+        },
+        {
+          "nombre": "mongo3",
+          "estado": "SECONDARY"
+        }
+      ],
+      "nodos_detenidos": [
+        "mongo1"
+      ],
+      "acciones": [
+        {
+          "hora_utc": "2026-11-02T21:07:18.758547+00:00",
+          "accion": "docker stop -t 0 mongo1"
+        },
+        {
+          "hora_utc": "2026-11-02T21:08:00.069901+00:00",
+          "accion": "docker start mongo1"
+        }
+      ],
+      "roles_durante_la_falla": [
+        {
+          "nombre": "mongo1",
+          "estado": "(not reachable/healthy)"
+        },
+        {
+          "nombre": "mongo2",
+          "estado": "PRIMARY"
+        },
+        {
+          "nombre": "mongo3",
+          "estado": "SECONDARY"
+        }
+      ],
+      "roles_despues": [
+        {
+          "nombre": "mongo1",
+          "estado": "SECONDARY"
+        },
+        {
+          "nombre": "mongo2",
+          "estado": "PRIMARY"
+        },
+        {
+          "nombre": "mongo3",
+          "estado": "SECONDARY"
+        }
+      ],
+      "ventana_falla_s": 40,
+      "segundos_hasta_replica_set_sano": 0.93,
+      "nuevo_primario_elegido": true,
+      "durante_la_falla": {
+        "intentos": 331,
+        "http_200": 331,
+        "http_503": 0,
+        "otros": 0,
+        "codigos": {
+          "200": 331
+        }
+      },
+      "rto_pausa_maxima_entre_200_s": 0.26,
+      "pausa_tipica_entre_200_s": 0.124,
+      "recuperacion_tras_restaurar_s": 0.04,
+      "intentos_sin_tareas_http_204": 0,
+      "rpo": {
+        "confirmadas_http_200": 424,
+        "confirmadas_ausentes_en_mongo": 0,
+        "duplicadas": 0,
+        "abiertas_en_mongo_sin_respuesta_200": 0
+      },
+      "latencia_ms_http_200": {
+        "muestras": 424,
+        "p50": 23.275,
+        "p95": 39.221,
+        "p99": 47.371,
+        "max": 160.316
+      },
+      "superado": true
+    },
+    {
+      "escenario": "C_sin_mayoria",
+      "descripcion": "Se detienen los dos secundarios, queda un solo nodo",
+      "roles_antes": [
+        {
+          "nombre": "mongo1",
+          "estado": "SECONDARY"
+        },
+        {
+          "nombre": "mongo2",
+          "estado": "PRIMARY"
+        },
+        {
+          "nombre": "mongo3",
+          "estado": "SECONDARY"
+        }
+      ],
+      "nodos_detenidos": [
+        "mongo1",
+        "mongo3"
+      ],
+      "acciones": [
+        {
+          "hora_utc": "2026-11-02T21:08:15.267975+00:00",
+          "accion": "docker stop -t 0 mongo1"
+        },
+        {
+          "hora_utc": "2026-11-02T21:08:15.640241+00:00",
+          "accion": "docker stop -t 0 mongo3"
+        },
+        {
+          "hora_utc": "2026-11-02T21:08:42.064275+00:00",
+          "accion": "docker start mongo1"
+        },
+        {
+          "hora_utc": "2026-11-02T21:08:42.398422+00:00",
+          "accion": "docker start mongo3"
+        }
+      ],
+      "roles_durante_la_falla": [
+        {
+          "nombre": "mongo1",
+          "estado": "(not reachable/healthy)"
+        },
+        {
+          "nombre": "mongo2",
+          "estado": "SECONDARY"
+        },
+        {
+          "nombre": "mongo3",
+          "estado": "(not reachable/healthy)"
+        }
+      ],
+      "roles_despues": [
+        {
+          "nombre": "mongo1",
+          "estado": "SECONDARY"
+        },
+        {
+          "nombre": "mongo2",
+          "estado": "PRIMARY"
+        },
+        {
+          "nombre": "mongo3",
+          "estado": "SECONDARY"
+        }
+      ],
+      "ventana_falla_s": 25,
+      "segundos_hasta_replica_set_sano": 6.82,
+      "nuevo_primario_elegido": false,
+      "durante_la_falla": {
+        "intentos": 10,
+        "http_200": 0,
+        "http_503": 10,
+        "otros": 0,
+        "codigos": {
+          "503": 10
+        }
+      },
+      "rto_pausa_maxima_entre_200_s": 31.63,
+      "pausa_tipica_entre_200_s": 0.126,
+      "recuperacion_tras_restaurar_s": 5.23,
+      "intentos_sin_tareas_http_204": 0,
+      "rpo": {
+        "confirmadas_http_200": 103,
+        "confirmadas_ausentes_en_mongo": 0,
+        "duplicadas": 0,
+        "abiertas_en_mongo_sin_respuesta_200": 4
+      },
+      "latencia_ms_http_200": {
+        "muestras": 103,
+        "p50": 25.167,
+        "p95": 40.777,
+        "p99": 47.562,
+        "max": 1004.336
+      },
+      "superado": true
+    }
+  ],
+  "prueba_superada": true
+}
