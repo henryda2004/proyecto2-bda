@@ -1,0 +1,9 @@
+Carga del registro 2026-11-02T14:46:00-06:00
+{
+  clientes: 60,
+  proyectos: 120,
+  batches: 600,
+  tareas: 60000,
+  anotadores: 300,
+  tareas_disponibles: 60000
+}
