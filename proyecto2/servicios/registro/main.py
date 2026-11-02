@@ -55,6 +55,57 @@ class SiguienteIn(BaseModel):
     proyecto_id: str
     plazo_seg: int = Field(default=120, gt=0)
 
+
+class TransicionIn(BaseModel):
+    accion: Literal["enviar", "iniciar_revision", "aprobar", "rechazar", "liberar"]
+    anotador_id: str | None = None
+    token: str | None = None
+    revisor_id: str | None = None
+    motivo: str | None = None
+    anotacion: dict | None = None
+
+
+TRANSICIONES = {
+    "enviar": {"desde": "abierta", "hacia": "anotada", "evento": "anotada"},
+    "iniciar_revision": {"desde": "anotada", "hacia": "en_revision", "evento": "en_revision"},
+    "aprobar": {"desde": "en_revision", "hacia": "aprobada", "evento": "aprobada"},
+    "rechazar": {"desde": "en_revision", "hacia": "disponible", "evento": "rechazada"},
+    "liberar": {"desde": "abierta", "hacia": "disponible", "evento": None},
+}
+
+REQUERIDOS = {
+    "enviar": ["anotador_id", "token", "anotacion"],
+    "liberar": ["anotador_id", "token"],
+    "iniciar_revision": ["revisor_id"],
+    "aprobar": ["revisor_id"],
+    "rechazar": ["revisor_id", "motivo"],
+}
+
+def construir_evento(tarea, version, estado, evento_id, ahora, **extra):
+    anotador_id = tarea["asignacion"]["anotador_id"]
+    anotador = db.anotadores.find_one({"_id": anotador_id})
+    proyecto = db.proyectos.find_one({"_id": tarea["proyecto_id"]})
+    evento = {
+        "event_id": evento_id,
+        "event_ts": ahora,
+        "tarea_id": tarea["_id"],
+        "version": version,
+        "estado": estado,
+        "cliente_id": tarea["cliente_id"],
+        "proyecto_id": tarea["proyecto_id"],
+        "batch_id": tarea["batch_id"],
+        "anotador_id": anotador_id,
+        "equipo_id": anotador["equipo_id"],
+        "revisor_id": None,
+        "modalidad": tarea["modalidad"],
+        "tipo_tarea": tarea["tipo_tarea"],
+        "duracion_seg": None,
+        "motivo_rechazo": None,
+        "sla_horas": proyecto["sla_horas"],
+    }
+    evento.update(extra)
+    return evento
+
 @app.exception_handler(PyMongoError)
 async def mongo_no_responde(request, exc):
     return JSONResponse(
@@ -194,24 +245,7 @@ def siguiente_tarea(datos: SiguienteIn):
     if tarea is None:
         return Response(status_code=204)
 
-    evento = {
-        "event_id": evento_id,
-        "event_ts": ahora,
-        "tarea_id": tarea["_id"],
-        "version": tarea["version"],
-        "estado": "abierta",
-        "cliente_id": tarea["cliente_id"],
-        "proyecto_id": tarea["proyecto_id"],
-        "batch_id": tarea["batch_id"],
-        "anotador_id": datos.anotador_id,
-        "equipo_id": anotador["equipo_id"],
-        "revisor_id": None,
-        "modalidad": tarea["modalidad"],
-        "tipo_tarea": tarea["tipo_tarea"],
-        "duracion_seg": None,
-        "motivo_rechazo": None,
-        "sla_horas": proyecto["sla_horas"],
-    }
+    evento = construir_evento(tarea, tarea["version"], "abierta", evento_id, ahora)
 
     return {
         "tarea": {
@@ -229,5 +263,95 @@ def siguiente_tarea(datos: SiguienteIn):
         },
         "token": token,
         "vence_en": tarea["asignacion"]["vence_en"],
+        "evento": evento,
+    }
+
+@app.post("/tareas/{tarea_id}/transicion")
+def transicion(tarea_id: str, datos: TransicionIn):
+    faltantes = [c for c in REQUERIDOS[datos.accion] if getattr(datos, c) in (None, "")]
+    if faltantes:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Faltan campos para {datos.accion}: {faltantes}",
+        )
+
+    regla = TRANSICIONES[datos.accion]
+    ahora = datetime.now(timezone.utc)
+    evento_id = str(uuid.uuid4())
+
+    filtro = {"_id": tarea_id, "estado": regla["desde"]}
+    if datos.accion in ("enviar", "liberar"):
+        filtro["asignacion.token"] = datos.token
+        filtro["asignacion.anotador_id"] = datos.anotador_id
+    if datos.accion in ("aprobar", "rechazar"):
+        filtro["revision.revisor_id"] = datos.revisor_id
+
+    if datos.accion == "enviar":
+        cambios = {
+            "estado": "anotada",
+            "anotacion": {"datos": datos.anotacion, "enviada_en": ahora},
+        }
+    elif datos.accion == "iniciar_revision":
+        cambios = {
+            "estado": "en_revision",
+            "revision": {"revisor_id": datos.revisor_id, "iniciada_en": ahora},
+        }
+    elif datos.accion == "aprobar":
+        cambios = {
+            "estado": "aprobada",
+            "ultima_revision": {
+                "revisor_id": datos.revisor_id,
+                "resultado": "aprobada",
+                "fecha": ahora,
+            },
+        }
+    elif datos.accion == "rechazar":
+        cambios = {
+            "estado": "disponible",
+            "asignacion": None,
+            "anotacion": None,
+            "revision": None,
+            "ultima_revision": {
+                "revisor_id": datos.revisor_id,
+                "resultado": "rechazada",
+                "motivo": datos.motivo,
+                "fecha": ahora,
+            },
+        }
+    else:
+        cambios = {"estado": "disponible", "asignacion": None}
+
+    if regla["evento"]:
+        cambios["ultimo_evento_id"] = evento_id
+
+    antes = db.tareas.find_one_and_update(
+        filtro,
+        {"$set": cambios, "$inc": {"version": 1}},
+        return_document=ReturnDocument.BEFORE,
+    )
+    if antes is None:
+        if db.tareas.count_documents({"_id": tarea_id}, limit=1) == 0:
+            raise HTTPException(status_code=404, detail="La tarea no existe")
+        raise HTTPException(
+            status_code=409,
+            detail="La tarea no esta en un estado que permita esta accion o el token no corresponde",
+        )
+
+    nueva_version = antes["version"] + 1
+    evento = None
+    if regla["evento"]:
+        extra = {}
+        if datos.accion == "enviar":
+            extra["duracion_seg"] = (ahora - antes["asignacion"]["tomada_en"]).total_seconds()
+        if datos.accion in ("iniciar_revision", "aprobar", "rechazar"):
+            extra["revisor_id"] = datos.revisor_id
+        if datos.accion == "rechazar":
+            extra["motivo_rechazo"] = datos.motivo
+        evento = construir_evento(antes, nueva_version, regla["evento"], evento_id, ahora, **extra)
+
+    return {
+        "tarea_id": tarea_id,
+        "estado": regla["hacia"],
+        "version": nueva_version,
         "evento": evento,
     }
