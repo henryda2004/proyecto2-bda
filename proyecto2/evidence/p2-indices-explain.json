@@ -1,0 +1,100 @@
+{
+  "fecha_hora_utc": "2026-11-02T20:51:41.650924+00:00",
+  "objetivo": "Justificar cada indice comparando el plan con indice contra un recorrido completo de la coleccion",
+  "comando": "python proyecto2/pruebas/p2_indices.py",
+  "tamanos": {
+    "tareas": 60010,
+    "proyectos": 121
+  },
+  "resultados": [
+    {
+      "consulta": "siguiente tarea",
+      "modo": "plan normal",
+      "indices_usados": [
+        "idx_tareas_proyecto_estado_prioridad",
+        "idx_tareas_proyecto_estado_prioridad"
+      ],
+      "recorrido_completo": false,
+      "claves_examinadas": 1,
+      "documentos_examinados": 1,
+      "devueltos": 1,
+      "ms": 0
+    },
+    {
+      "consulta": "siguiente tarea",
+      "modo": "recorrido completo forzado",
+      "indices_usados": [],
+      "recorrido_completo": true,
+      "claves_examinadas": 0,
+      "documentos_examinados": 60010,
+      "devueltos": 1,
+      "ms": 69
+    },
+    {
+      "consulta": "tarea abierta de un anotador",
+      "modo": "plan normal",
+      "indices_usados": [
+        "idx_tareas_anotador_estado"
+      ],
+      "recorrido_completo": false,
+      "claves_examinadas": 1,
+      "documentos_examinados": 1,
+      "devueltos": 1,
+      "ms": 0
+    },
+    {
+      "consulta": "tarea abierta de un anotador",
+      "modo": "recorrido completo forzado",
+      "indices_usados": [],
+      "recorrido_completo": true,
+      "claves_examinadas": 0,
+      "documentos_examinados": 60010,
+      "devueltos": 1,
+      "ms": 38
+    },
+    {
+      "consulta": "tareas de un lote",
+      "modo": "plan normal",
+      "indices_usados": [
+        "idx_tareas_batch"
+      ],
+      "recorrido_completo": false,
+      "claves_examinadas": 100,
+      "documentos_examinados": 100,
+      "devueltos": 100,
+      "ms": 0
+    },
+    {
+      "consulta": "tareas de un lote",
+      "modo": "recorrido completo forzado",
+      "indices_usados": [],
+      "recorrido_completo": true,
+      "claves_examinadas": 0,
+      "documentos_examinados": 60010,
+      "devueltos": 100,
+      "ms": 41
+    },
+    {
+      "consulta": "proyectos activos de un cliente",
+      "modo": "plan normal",
+      "indices_usados": [
+        "idx_proyectos_cliente_estado"
+      ],
+      "recorrido_completo": false,
+      "claves_examinadas": 2,
+      "documentos_examinados": 2,
+      "devueltos": 2,
+      "ms": 0
+    },
+    {
+      "consulta": "proyectos activos de un cliente",
+      "modo": "recorrido completo forzado",
+      "indices_usados": [],
+      "recorrido_completo": true,
+      "claves_examinadas": 0,
+      "documentos_examinados": 121,
+      "devueltos": 2,
+      "ms": 0
+    }
+  ]
+}
