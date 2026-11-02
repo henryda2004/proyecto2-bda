@@ -1,0 +1,677 @@
+[
+  {
+    "nombre": "salud",
+    "peticion": {
+      "metodo": "GET",
+      "ruta": "/salud",
+      "cuerpo": null
+    },
+    "http": 200,
+    "respuesta": {
+      "servicio": "registro",
+      "estado": "operativo"
+    }
+  },
+  {
+    "nombre": "proyecto_invalido",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/proyectos",
+      "cuerpo": {
+        "cliente_id": "cli-ejemplo"
+      }
+    },
+    "http": 422,
+    "respuesta": {
+      "detail": [
+        {
+          "type": "missing",
+          "loc": [
+            "body",
+            "nombre"
+          ],
+          "msg": "Field required",
+          "input": {
+            "cliente_id": "cli-ejemplo"
+          }
+        },
+        {
+          "type": "missing",
+          "loc": [
+            "body",
+            "modalidad"
+          ],
+          "msg": "Field required",
+          "input": {
+            "cliente_id": "cli-ejemplo"
+          }
+        },
+        {
+          "type": "missing",
+          "loc": [
+            "body",
+            "taxonomia"
+          ],
+          "msg": "Field required",
+          "input": {
+            "cliente_id": "cli-ejemplo"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "nombre": "proyecto_cliente_inexistente",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/proyectos",
+      "cuerpo": {
+        "cliente_id": "no-existe",
+        "nombre": "x",
+        "modalidad": "lidar",
+        "taxonomia": [
+          {
+            "nombre": "a",
+            "instruccion": "b"
+          }
+        ]
+      }
+    },
+    "http": 404,
+    "respuesta": {
+      "detail": "El cliente no existe"
+    }
+  },
+  {
+    "nombre": "crear_proyecto",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/proyectos",
+      "cuerpo": {
+        "cliente_id": "cli-ejemplo",
+        "nombre": "Proyecto de ejemplo",
+        "modalidad": "lidar",
+        "taxonomia": [
+          {
+            "nombre": "lidar#peaton",
+            "instruccion": "Persona a pie"
+          }
+        ],
+        "reglas": "Marcar todos los peatones visibles",
+        "sla_horas": 48
+      }
+    },
+    "http": 201,
+    "respuesta": {
+      "id": "77b4ae19-0503-4405-86df-2aa130b37693",
+      "estado": "activo"
+    }
+  },
+  {
+    "nombre": "crear_lote",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/proyectos/77b4ae19-0503-4405-86df-2aa130b37693/lotes",
+      "cuerpo": {
+        "nombre": "lote-ejemplo",
+        "tareas": [
+          {
+            "uri": "s3://ejemplo/escena-0.pcd",
+            "sha256": "ac0985bf3362999eefad644c498727330388198f4e0d06cb4e8f45854afb453f",
+            "bytes": 1048576,
+            "mime": "application/octet-stream",
+            "meta": {},
+            "tipo_tarea": "cuboide_3d",
+            "prioridad": 0
+          },
+          {
+            "uri": "s3://ejemplo/escena-1.pcd",
+            "sha256": "355b1ac31df945a267bb6757e0f45f0797388191796f0217cae6c4c24e50f9c7",
+            "bytes": 1048576,
+            "mime": "application/octet-stream",
+            "meta": {},
+            "tipo_tarea": "cuboide_3d",
+            "prioridad": 0
+          },
+          {
+            "uri": "s3://ejemplo/escena-2.pcd",
+            "sha256": "77c02f6473b2434d9f7bbf5363f4e44c15f2590130dc4726c30d436df3d47303",
+            "bytes": 1048576,
+            "mime": "application/octet-stream",
+            "meta": {},
+            "tipo_tarea": "cuboide_3d",
+            "prioridad": 0
+          }
+        ]
+      }
+    },
+    "http": 201,
+    "respuesta": {
+      "id": "42d02264-09bc-4ae7-93d9-1ba497d2e8b0",
+      "tareas": 3
+    }
+  },
+  {
+    "nombre": "lote_proyecto_inexistente",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/proyectos/no-existe/lotes",
+      "cuerpo": {
+        "nombre": "x",
+        "tareas": [
+          {
+            "uri": "s3://ejemplo/escena-99.pcd",
+            "sha256": "3b3cfa1733d2e65150dc9c6be275b9a6bee02d37ab70afd5e58674c7f7ce6f7f",
+            "bytes": 1048576,
+            "mime": "application/octet-stream",
+            "meta": {},
+            "tipo_tarea": "cuboide_3d",
+            "prioridad": 0
+          }
+        ]
+      }
+    },
+    "http": 404,
+    "respuesta": {
+      "detail": "El proyecto no existe"
+    }
+  },
+  {
+    "nombre": "siguiente_tarea",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/tareas/siguiente",
+      "cuerpo": {
+        "anotador_id": "ana-ejemplo",
+        "proyecto_id": "77b4ae19-0503-4405-86df-2aa130b37693",
+        "plazo_seg": 600
+      }
+    },
+    "http": 200,
+    "respuesta": {
+      "tarea": {
+        "id": "a4351d6f-1e37-4977-986a-6710b21e9b95",
+        "proyecto_id": "77b4ae19-0503-4405-86df-2aa130b37693",
+        "uri": "s3://ejemplo/escena-2.pcd",
+        "sha256": "77c02f6473b2434d9f7bbf5363f4e44c15f2590130dc4726c30d436df3d47303",
+        "bytes": 1048576,
+        "mime": "application/octet-stream",
+        "meta": {},
+        "modalidad": "lidar",
+        "tipo_tarea": "cuboide_3d",
+        "taxonomia": [
+          {
+            "nombre": "lidar#peaton",
+            "instruccion": "Persona a pie"
+          }
+        ],
+        "reglas": "Marcar todos los peatones visibles"
+      },
+      "token": "ebb1f18a-ed17-4f2a-b8ff-e2be636db366",
+      "vence_en": "2026-11-02T21:26:32.302000+00:00",
+      "evento": {
+        "event_id": "6029b85f-ac20-456f-9d68-d354c1c50ad0",
+        "event_ts": "2026-11-02T21:16:32.302522+00:00",
+        "tarea_id": "a4351d6f-1e37-4977-986a-6710b21e9b95",
+        "version": 1,
+        "estado": "abierta",
+        "cliente_id": "cli-ejemplo",
+        "proyecto_id": "77b4ae19-0503-4405-86df-2aa130b37693",
+        "batch_id": "42d02264-09bc-4ae7-93d9-1ba497d2e8b0",
+        "anotador_id": "ana-ejemplo",
+        "equipo_id": "equipo-01",
+        "revisor_id": null,
+        "modalidad": "lidar",
+        "tipo_tarea": "cuboide_3d",
+        "duracion_seg": null,
+        "motivo_rechazo": null,
+        "sla_horas": 48
+      }
+    }
+  },
+  {
+    "nombre": "enviar_token_incorrecto",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/tareas/a4351d6f-1e37-4977-986a-6710b21e9b95/transicion",
+      "cuerpo": {
+        "accion": "enviar",
+        "anotador_id": "ana-ejemplo",
+        "token": "incorrecto",
+        "anotacion": {}
+      }
+    },
+    "http": 409,
+    "respuesta": {
+      "detail": "La tarea no esta en un estado que permita esta accion o el token no corresponde"
+    }
+  },
+  {
+    "nombre": "enviar",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/tareas/a4351d6f-1e37-4977-986a-6710b21e9b95/transicion",
+      "cuerpo": {
+        "accion": "enviar",
+        "anotador_id": "ana-ejemplo",
+        "token": "ebb1f18a-ed17-4f2a-b8ff-e2be636db366",
+        "anotacion": {
+          "cuboides": [
+            {
+              "x": 1,
+              "y": 2,
+              "z": 3
+            }
+          ]
+        }
+      }
+    },
+    "http": 200,
+    "respuesta": {
+      "tarea_id": "a4351d6f-1e37-4977-986a-6710b21e9b95",
+      "estado": "anotada",
+      "version": 2,
+      "evento": {
+        "event_id": "5406ea8d-dec1-4191-9a68-cac8687c20a2",
+        "event_ts": "2026-11-02T21:16:32.323350+00:00",
+        "tarea_id": "a4351d6f-1e37-4977-986a-6710b21e9b95",
+        "version": 2,
+        "estado": "anotada",
+        "cliente_id": "cli-ejemplo",
+        "proyecto_id": "77b4ae19-0503-4405-86df-2aa130b37693",
+        "batch_id": "42d02264-09bc-4ae7-93d9-1ba497d2e8b0",
+        "anotador_id": "ana-ejemplo",
+        "equipo_id": "equipo-01",
+        "revisor_id": null,
+        "modalidad": "lidar",
+        "tipo_tarea": "cuboide_3d",
+        "duracion_seg": 0.02135,
+        "motivo_rechazo": null,
+        "sla_horas": 48
+      }
+    }
+  },
+  {
+    "nombre": "enviar_otra_vez",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/tareas/a4351d6f-1e37-4977-986a-6710b21e9b95/transicion",
+      "cuerpo": {
+        "accion": "enviar",
+        "anotador_id": "ana-ejemplo",
+        "token": "ebb1f18a-ed17-4f2a-b8ff-e2be636db366",
+        "anotacion": {}
+      }
+    },
+    "http": 409,
+    "respuesta": {
+      "detail": "La tarea no esta en un estado que permita esta accion o el token no corresponde"
+    }
+  },
+  {
+    "nombre": "iniciar_revision",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/tareas/a4351d6f-1e37-4977-986a-6710b21e9b95/transicion",
+      "cuerpo": {
+        "accion": "iniciar_revision",
+        "revisor_id": "rev-ejemplo"
+      }
+    },
+    "http": 200,
+    "respuesta": {
+      "tarea_id": "a4351d6f-1e37-4977-986a-6710b21e9b95",
+      "estado": "en_revision",
+      "version": 3,
+      "evento": {
+        "event_id": "4e901810-816d-4277-b22e-69b9652dd4b1",
+        "event_ts": "2026-11-02T21:16:32.358541+00:00",
+        "tarea_id": "a4351d6f-1e37-4977-986a-6710b21e9b95",
+        "version": 3,
+        "estado": "en_revision",
+        "cliente_id": "cli-ejemplo",
+        "proyecto_id": "77b4ae19-0503-4405-86df-2aa130b37693",
+        "batch_id": "42d02264-09bc-4ae7-93d9-1ba497d2e8b0",
+        "anotador_id": "ana-ejemplo",
+        "equipo_id": "equipo-01",
+        "revisor_id": "rev-ejemplo",
+        "modalidad": "lidar",
+        "tipo_tarea": "cuboide_3d",
+        "duracion_seg": null,
+        "motivo_rechazo": null,
+        "sla_horas": 48
+      }
+    }
+  },
+  {
+    "nombre": "aprobar",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/tareas/a4351d6f-1e37-4977-986a-6710b21e9b95/transicion",
+      "cuerpo": {
+        "accion": "aprobar",
+        "revisor_id": "rev-ejemplo"
+      }
+    },
+    "http": 200,
+    "respuesta": {
+      "tarea_id": "a4351d6f-1e37-4977-986a-6710b21e9b95",
+      "estado": "aprobada",
+      "version": 4,
+      "evento": {
+        "event_id": "a3dc80a0-d517-46a1-9d6f-1db587563012",
+        "event_ts": "2026-11-02T21:16:32.370905+00:00",
+        "tarea_id": "a4351d6f-1e37-4977-986a-6710b21e9b95",
+        "version": 4,
+        "estado": "aprobada",
+        "cliente_id": "cli-ejemplo",
+        "proyecto_id": "77b4ae19-0503-4405-86df-2aa130b37693",
+        "batch_id": "42d02264-09bc-4ae7-93d9-1ba497d2e8b0",
+        "anotador_id": "ana-ejemplo",
+        "equipo_id": "equipo-01",
+        "revisor_id": "rev-ejemplo",
+        "modalidad": "lidar",
+        "tipo_tarea": "cuboide_3d",
+        "duracion_seg": null,
+        "motivo_rechazo": null,
+        "sla_horas": 48
+      }
+    }
+  },
+  {
+    "nombre": "siguiente_tarea_2",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/tareas/siguiente",
+      "cuerpo": {
+        "anotador_id": "ana-ejemplo",
+        "proyecto_id": "77b4ae19-0503-4405-86df-2aa130b37693",
+        "plazo_seg": 600
+      }
+    },
+    "http": 200,
+    "respuesta": {
+      "tarea": {
+        "id": "08019383-3e0e-4f4a-bf7d-fdcff1087d84",
+        "proyecto_id": "77b4ae19-0503-4405-86df-2aa130b37693",
+        "uri": "s3://ejemplo/escena-1.pcd",
+        "sha256": "355b1ac31df945a267bb6757e0f45f0797388191796f0217cae6c4c24e50f9c7",
+        "bytes": 1048576,
+        "mime": "application/octet-stream",
+        "meta": {},
+        "modalidad": "lidar",
+        "tipo_tarea": "cuboide_3d",
+        "taxonomia": [
+          {
+            "nombre": "lidar#peaton",
+            "instruccion": "Persona a pie"
+          }
+        ],
+        "reglas": "Marcar todos los peatones visibles"
+      },
+      "token": "dc886cca-5b5e-4c1b-b470-6ea961dc6425",
+      "vence_en": "2026-11-02T21:26:32.385000+00:00",
+      "evento": {
+        "event_id": "437035c4-af18-424c-8a81-94fc649ad250",
+        "event_ts": "2026-11-02T21:16:32.385263+00:00",
+        "tarea_id": "08019383-3e0e-4f4a-bf7d-fdcff1087d84",
+        "version": 1,
+        "estado": "abierta",
+        "cliente_id": "cli-ejemplo",
+        "proyecto_id": "77b4ae19-0503-4405-86df-2aa130b37693",
+        "batch_id": "42d02264-09bc-4ae7-93d9-1ba497d2e8b0",
+        "anotador_id": "ana-ejemplo",
+        "equipo_id": "equipo-01",
+        "revisor_id": null,
+        "modalidad": "lidar",
+        "tipo_tarea": "cuboide_3d",
+        "duracion_seg": null,
+        "motivo_rechazo": null,
+        "sla_horas": 48
+      }
+    }
+  },
+  {
+    "nombre": "enviar_2",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/tareas/08019383-3e0e-4f4a-bf7d-fdcff1087d84/transicion",
+      "cuerpo": {
+        "accion": "enviar",
+        "anotador_id": "ana-ejemplo",
+        "token": "dc886cca-5b5e-4c1b-b470-6ea961dc6425",
+        "anotacion": {}
+      }
+    },
+    "http": 200,
+    "respuesta": {
+      "tarea_id": "08019383-3e0e-4f4a-bf7d-fdcff1087d84",
+      "estado": "anotada",
+      "version": 2,
+      "evento": {
+        "event_id": "3479b214-467b-4cb4-964c-06e18a249a7a",
+        "event_ts": "2026-11-02T21:16:32.414606+00:00",
+        "tarea_id": "08019383-3e0e-4f4a-bf7d-fdcff1087d84",
+        "version": 2,
+        "estado": "anotada",
+        "cliente_id": "cli-ejemplo",
+        "proyecto_id": "77b4ae19-0503-4405-86df-2aa130b37693",
+        "batch_id": "42d02264-09bc-4ae7-93d9-1ba497d2e8b0",
+        "anotador_id": "ana-ejemplo",
+        "equipo_id": "equipo-01",
+        "revisor_id": null,
+        "modalidad": "lidar",
+        "tipo_tarea": "cuboide_3d",
+        "duracion_seg": 0.029606,
+        "motivo_rechazo": null,
+        "sla_horas": 48
+      }
+    }
+  },
+  {
+    "nombre": "iniciar_revision_2",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/tareas/08019383-3e0e-4f4a-bf7d-fdcff1087d84/transicion",
+      "cuerpo": {
+        "accion": "iniciar_revision",
+        "revisor_id": "rev-ejemplo"
+      }
+    },
+    "http": 200,
+    "respuesta": {
+      "tarea_id": "08019383-3e0e-4f4a-bf7d-fdcff1087d84",
+      "estado": "en_revision",
+      "version": 3,
+      "evento": {
+        "event_id": "f351d1d5-b51c-4176-9cdf-b3bbbc9c7634",
+        "event_ts": "2026-11-02T21:16:32.431609+00:00",
+        "tarea_id": "08019383-3e0e-4f4a-bf7d-fdcff1087d84",
+        "version": 3,
+        "estado": "en_revision",
+        "cliente_id": "cli-ejemplo",
+        "proyecto_id": "77b4ae19-0503-4405-86df-2aa130b37693",
+        "batch_id": "42d02264-09bc-4ae7-93d9-1ba497d2e8b0",
+        "anotador_id": "ana-ejemplo",
+        "equipo_id": "equipo-01",
+        "revisor_id": "rev-ejemplo",
+        "modalidad": "lidar",
+        "tipo_tarea": "cuboide_3d",
+        "duracion_seg": null,
+        "motivo_rechazo": null,
+        "sla_horas": 48
+      }
+    }
+  },
+  {
+    "nombre": "rechazar",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/tareas/08019383-3e0e-4f4a-bf7d-fdcff1087d84/transicion",
+      "cuerpo": {
+        "accion": "rechazar",
+        "revisor_id": "rev-ejemplo",
+        "motivo": "Falta un peaton"
+      }
+    },
+    "http": 200,
+    "respuesta": {
+      "tarea_id": "08019383-3e0e-4f4a-bf7d-fdcff1087d84",
+      "estado": "disponible",
+      "version": 4,
+      "evento": {
+        "event_id": "9fbbbee4-bb64-4591-a263-93185f9cf07c",
+        "event_ts": "2026-11-02T21:16:32.446885+00:00",
+        "tarea_id": "08019383-3e0e-4f4a-bf7d-fdcff1087d84",
+        "version": 4,
+        "estado": "rechazada",
+        "cliente_id": "cli-ejemplo",
+        "proyecto_id": "77b4ae19-0503-4405-86df-2aa130b37693",
+        "batch_id": "42d02264-09bc-4ae7-93d9-1ba497d2e8b0",
+        "anotador_id": "ana-ejemplo",
+        "equipo_id": "equipo-01",
+        "revisor_id": "rev-ejemplo",
+        "modalidad": "lidar",
+        "tipo_tarea": "cuboide_3d",
+        "duracion_seg": null,
+        "motivo_rechazo": "Falta un peaton",
+        "sla_horas": 48
+      }
+    }
+  },
+  {
+    "nombre": "siguiente_tarea_3",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/tareas/siguiente",
+      "cuerpo": {
+        "anotador_id": "ana-ejemplo",
+        "proyecto_id": "77b4ae19-0503-4405-86df-2aa130b37693",
+        "plazo_seg": 600
+      }
+    },
+    "http": 200,
+    "respuesta": {
+      "tarea": {
+        "id": "08019383-3e0e-4f4a-bf7d-fdcff1087d84",
+        "proyecto_id": "77b4ae19-0503-4405-86df-2aa130b37693",
+        "uri": "s3://ejemplo/escena-1.pcd",
+        "sha256": "355b1ac31df945a267bb6757e0f45f0797388191796f0217cae6c4c24e50f9c7",
+        "bytes": 1048576,
+        "mime": "application/octet-stream",
+        "meta": {},
+        "modalidad": "lidar",
+        "tipo_tarea": "cuboide_3d",
+        "taxonomia": [
+          {
+            "nombre": "lidar#peaton",
+            "instruccion": "Persona a pie"
+          }
+        ],
+        "reglas": "Marcar todos los peatones visibles"
+      },
+      "token": "170cbf03-72bc-4121-8884-580baafb490a",
+      "vence_en": "2026-11-02T21:26:32.462000+00:00",
+      "evento": {
+        "event_id": "d092146c-a58b-4442-a640-e966c9bd5ebc",
+        "event_ts": "2026-11-02T21:16:32.462964+00:00",
+        "tarea_id": "08019383-3e0e-4f4a-bf7d-fdcff1087d84",
+        "version": 5,
+        "estado": "abierta",
+        "cliente_id": "cli-ejemplo",
+        "proyecto_id": "77b4ae19-0503-4405-86df-2aa130b37693",
+        "batch_id": "42d02264-09bc-4ae7-93d9-1ba497d2e8b0",
+        "anotador_id": "ana-ejemplo",
+        "equipo_id": "equipo-01",
+        "revisor_id": null,
+        "modalidad": "lidar",
+        "tipo_tarea": "cuboide_3d",
+        "duracion_seg": null,
+        "motivo_rechazo": null,
+        "sla_horas": 48
+      }
+    }
+  },
+  {
+    "nombre": "liberar",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/tareas/08019383-3e0e-4f4a-bf7d-fdcff1087d84/transicion",
+      "cuerpo": {
+        "accion": "liberar",
+        "anotador_id": "ana-ejemplo",
+        "token": "170cbf03-72bc-4121-8884-580baafb490a"
+      }
+    },
+    "http": 200,
+    "respuesta": {
+      "tarea_id": "08019383-3e0e-4f4a-bf7d-fdcff1087d84",
+      "estado": "disponible",
+      "version": 6,
+      "evento": null
+    }
+  },
+  {
+    "nombre": "siguiente_proyecto_inexistente",
+    "peticion": {
+      "metodo": "POST",
+      "ruta": "/tareas/siguiente",
+      "cuerpo": {
+        "anotador_id": "ana-ejemplo",
+        "proyecto_id": "no-existe"
+      }
+    },
+    "http": 404,
+    "respuesta": {
+      "detail": "El proyecto no existe"
+    }
+  },
+  {
+    "nombre": "exportar_pagina_1",
+    "peticion": {
+      "metodo": "GET",
+      "ruta": "/proyectos/77b4ae19-0503-4405-86df-2aa130b37693/exportar?limite=2",
+      "cuerpo": null
+    },
+    "http": 200,
+    "respuesta": {
+      "tareas": [
+        {
+          "id": "a4351d6f-1e37-4977-986a-6710b21e9b95",
+          "uri": "s3://ejemplo/escena-2.pcd",
+          "sha256": "77c02f6473b2434d9f7bbf5363f4e44c15f2590130dc4726c30d436df3d47303",
+          "bytes": 1048576,
+          "mime": "application/octet-stream",
+          "meta": {},
+          "modalidad": "lidar",
+          "tipo_tarea": "cuboide_3d",
+          "anotacion": {
+            "cuboides": [
+              {
+                "x": 1,
+                "y": 2,
+                "z": 3
+              }
+            ]
+          },
+          "revisado_por": "rev-ejemplo",
+          "aprobada_en": "2026-11-02T21:16:32.370000+00:00"
+        }
+      ],
+      "limite": 2,
+      "siguiente": null
+    }
+  },
+  {
+    "nombre": "exportar_proyecto_inexistente",
+    "peticion": {
+      "metodo": "GET",
+      "ruta": "/proyectos/no-existe/exportar",
+      "cuerpo": null
+    },
+    "http": 404,
+    "respuesta": {
+      "detail": "El proyecto no existe"
+    }
+  }
+]
