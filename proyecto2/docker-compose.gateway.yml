@@ -1,0 +1,18 @@
+# Complementa la configuracion de Docker Compose para incorporar
+# el gateway. Define su construccion, la direccion del registro,
+# su conexion a la red backend y la publicacion del puerto 8000.
+# Tambien establece su dependencia del servicio de registro
+# y la politica de reinicio del contenedor.
+
+services:
+  gateway:
+    build: ./servicios/gateway
+    environment:
+      REGISTRO_URL: http://registro:8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - registro
+    networks:
+      - backend
+    restart: unless-stopped
