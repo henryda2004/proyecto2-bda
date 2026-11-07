@@ -1,0 +1,8 @@
+HTTP/1.1 201 Created
+date: Thu, 05 Nov 2026 04:41:41 GMT
+server: uvicorn
+content-type: application/json
+content-length: 56
+x-request-id: gateway-crear-lote-01
+
+{"id":"df633076-5252-4026-9c6a-abf4784b1577","tareas":2}

@@ -1,14 +1,15 @@
-# Complementa la configuracion de Docker Compose para incorporar
-# el gateway. Define su construccion, la direccion del registro,
-# su conexion a la red backend y la publicacion del puerto 8000.
-# Tambien establece su dependencia del servicio de registro
-# y la politica de reinicio del contenedor.
+
+# Despliega el gateway, la API de sesion y Valkey.
+# Valkey conserva sus datos en un volumen y utiliza AOF everysec.
 
 services:
   gateway:
-    build: ./servicios/gateway
+    build:
+      context: ./servicios/gateway
+      dockerfile: dockerfile
     environment:
       REGISTRO_URL: http://registro:8000
+      SESION_URL: http://sesion:8000
     ports:
       - "8000:8000"
     depends_on:
@@ -16,3 +17,33 @@ services:
     networks:
       - backend
     restart: unless-stopped
+
+  valkey:
+    image: valkey/valkey:8.1
+    command: ["valkey-server", "--appendonly", "yes", "--appendfsync", "everysec"]
+    volumes:
+      - valkey_data:/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  sesion:
+    build:
+      context: ./servicios/sesion
+      dockerfile: dockerfile
+    environment:
+      VALKEY_URL: valkey://valkey:6379/0
+    depends_on:
+      valkey:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  valkey_data:

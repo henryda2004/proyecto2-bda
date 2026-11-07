@@ -12,7 +12,10 @@ su seguimiento y devuelve 503 si no puede contactar al registro.
 import asyncio
 import os
 import uuid
+import json
+import logging 
 from contextlib import asynccontextmanager
+from urllib.parse import quote
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request, Response
@@ -49,20 +52,21 @@ async def identificar_solicitud(request: Request, call_next):
     return respuesta
 
 
-async def reenviar(request: Request, metodo: str, ruta: str, datos=None):
+async def reenviar(request: Request, metodo: str, ruta: str, datos=None, *, servicio="registro"):
     try:
         respuesta = await request.app.state.http.request(
             metodo,
-            f"{SERVICIOS['registro']}{ruta}",
+            f"{SERVICIOS[servicio]}{ruta}",
             json=datos,
             params=request.query_params.multi_items(),
             headers={"X-Request-ID": request.state.request_id},
         )
     except httpx.RequestError:
-        raise HTTPException(
-            status_code=503,
-            detail="El registro no esta disponible",
+        detalle = (
+            "El registro no esta disponible"
+            if servicio == "registro" else f"El servicio {servicio} no esta disponible"
         )
+        return JSONResponse(status_code=503, content={"detail": detalle})
 
     headers = {}
     if "content-type" in respuesta.headers:
@@ -149,3 +153,56 @@ async def exportar(proyecto_id: str, request: Request):
         "GET",
         f"/proyectos/{proyecto_id}/exportar",
     )
+async def cerrar_lock(request, tarea_id, propietario):
+    respuesta = await reenviar(
+        request, "POST", f"/tareas/{quote(tarea_id, safe='')}/liberar",
+        propietario, servicio="sesion",
+    )
+    if respuesta.status_code != 204:
+        logging.warning("El candado de la tarea %s queda pendiente de vencer", tarea_id)
+
+
+@app.post("/tareas/siguiente")
+async def siguiente_tarea(request: Request, datos: dict):
+    asignacion = await reenviar(
+        request, "POST", "/tareas/siguiente", {**datos, "plazo_seg": 120}
+    )
+    if asignacion.status_code != 200:
+        return asignacion
+
+    cuerpo = json.loads(asignacion.body)
+    tarea = cuerpo["tarea"]
+    propietario = {"anotador_id": datos["anotador_id"], "token": cuerpo["token"]}
+    sesion = await reenviar(
+        request, "POST", "/sesiones",
+        {**propietario, "tarea": tarea, "vence_en": cuerpo["vence_en"]},
+        servicio="sesion",
+    )
+    if sesion.status_code == 201:
+        cuerpo["borrador"] = json.loads(sesion.body)["borrador"]
+        return cuerpo
+
+    await cerrar_lock(request, tarea["id"], propietario)
+    ruta = f"/tareas/{quote(tarea['id'], safe='')}/transicion"
+    reversa = await reenviar(request, "POST", ruta, {**propietario, "accion": "liberar"})
+    if reversa.status_code not in (200, 404, 409):
+        logging.warning("La asignación de la tarea %s queda pendiente de vencer", tarea["id"])
+    return sesion
+
+
+@app.post("/tareas/{tarea_id}/liberar")
+async def liberar_tarea(tarea_id: str, request: Request, datos: dict):
+    ruta = f"/tareas/{quote(tarea_id, safe='')}/transicion"
+    respuesta = await reenviar(request, "POST", ruta, {**datos, "accion": "liberar"})
+    if respuesta.status_code == 200:
+        await cerrar_lock(request, tarea_id, datos)
+    return respuesta
+@app.put("/tareas/{tarea_id}/borrador")
+async def guardar_borrador(tarea_id: str, request: Request, datos: dict):
+    ruta = f"/tareas/{quote(tarea_id, safe='')}/borrador"
+    return await reenviar(request, "PUT", ruta, datos, servicio="sesion")
+
+
+@app.post("/sesiones/recuperar")
+async def recuperar_sesion(request: Request, datos: dict):
+    return await reenviar(request, "POST", "/sesiones/recuperar", datos, servicio="sesion")

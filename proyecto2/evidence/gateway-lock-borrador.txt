@@ -1,0 +1,10 @@
+{"metodo": "POST", "ruta": "/tareas/siguiente", "http": 404, "x_request_id": "301cac85-1d0a-423c-8e4f-e6030a89b511", "respuesta": {"detail": "Not Found"}}
+Traceback (most recent call last):
+  File "/mnt/c/Users/niico/OneDrive - Estudiantes ITCR/2026/Segundo Semestre/BD/proyecto2-bda-gateway/proyecto2/pruebas/sesion_basica.py", line 75, in <module>
+    probar(sys.argv[1], sys.argv[2])
+  File "/mnt/c/Users/niico/OneDrive - Estudiantes ITCR/2026/Segundo Semestre/BD/proyecto2-bda-gateway/proyecto2/pruebas/sesion_basica.py", line 46, in probar
+    asignacion = llamar("POST", "/tareas/siguiente", {
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/c/Users/niico/OneDrive - Estudiantes ITCR/2026/Segundo Semestre/BD/proyecto2-bda-gateway/proyecto2/pruebas/sesion_basica.py", line 37, in llamar
+    raise RuntimeError(f"Se esperaba HTTP {esperado} y llegó {respuesta.status}")
+RuntimeError: Se esperaba HTTP 200 y llegó 404

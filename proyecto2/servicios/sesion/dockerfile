@@ -1,0 +1,13 @@
+# Construye el servicio de sesion con Python 3.12,
+# instala sus dependencias y lo ejecuta en el puerto 8000.
+
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY requerimientos.txt .
+RUN pip install --no-cache-dir -r requerimientos.txt
+
+COPY main.py .
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,0 +1,8 @@
+HTTP/1.1 201 Created
+date: Thu, 05 Nov 2026 04:35:12 GMT
+server: uvicorn
+content-type: application/json
+content-length: 63
+x-request-id: gateway-crear-proyecto-01
+
+{"id":"0c1644c7-c835-4abe-b280-875e1abceb22","estado":"activo"}

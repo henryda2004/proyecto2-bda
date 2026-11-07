@@ -1,0 +1,8 @@
+HTTP/1.1 200 OK
+date: Thu, 05 Nov 2026 04:59:18 GMT
+server: uvicorn
+content-length: 343
+content-type: application/json
+x-request-id: f42aec42-8659-4385-9556-476aca536257
+
+{"servicio":"gateway","estado":"degradado","capas":{"registro":{"servicio":"registro","estado":"operativo","nodos_sanos":3,"nodos_total":3},"sesion":{"servicio":"sesion","estado":"operativo","aof":true,"appendfsync":"everysec","actualizado_en":"2026-11-05T04:59:19.134995+00:00"},"historial":{"estado":"caido"},"analitica":{"estado":"caido"}}}

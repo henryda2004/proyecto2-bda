@@ -1,0 +1,7 @@
+# Dependencias de la API de sesion, su servidor HTTP
+# y el cliente asincrono para comunicarse con Valkey.
+
+fastapi==0.115.6
+uvicorn==0.34.0
+valkey==6.1.1
+
