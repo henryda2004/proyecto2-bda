@@ -15,6 +15,7 @@ import uuid
 import json
 import logging 
 from contextlib import asynccontextmanager
+from typing import Literal
 from urllib.parse import quote
 from pydantic import BaseModel, Field
 
@@ -198,15 +199,21 @@ async def liberar_tarea(tarea_id: str, request: Request, datos: dict):
     if respuesta.status_code == 200:
         await cerrar_lock(request, tarea_id, datos)
     return respuesta
-class BorradorIn(BaseModel):
+
+class PropietarioIn(BaseModel):
     anotador_id: str = Field(min_length=1)
     token: str = Field(min_length=1)
+
+
+class BorradorIn(PropietarioIn):
     borrador: dict
 
 
-@app.put("/tareas/{tarea_id}/borrador")
-async def guardar_borrador(tarea_id: str, request: Request, datos: BorradorIn):
-    propietario = datos.model_dump(exclude={"borrador"})
+class EnvioIn(PropietarioIn):
+    anotacion: dict
+
+
+async def validar_candado(request: Request, tarea_id: str, propietario: dict):
     sesion = await reenviar(
         request, "POST", "/sesiones/recuperar", propietario, servicio="sesion"
     )
@@ -216,6 +223,15 @@ async def guardar_borrador(tarea_id: str, request: Request, datos: BorradorIn):
         return sesion
     if json.loads(sesion.body)["tarea"]["id"] != tarea_id:
         return JSONResponse(status_code=409, content={"detail": "El candado es de otra tarea"})
+    return None
+
+
+@app.put("/tareas/{tarea_id}/borrador")
+async def guardar_borrador(tarea_id: str, request: Request, datos: BorradorIn):
+    propietario = datos.model_dump(exclude={"borrador"})
+    error = await validar_candado(request, tarea_id, propietario)
+    if error is not None:
+        return error
 
     tarea = quote(tarea_id, safe="")
     plazo = await reenviar(
@@ -230,8 +246,44 @@ async def guardar_borrador(tarea_id: str, request: Request, datos: BorradorIn):
         request, "PUT", f"/tareas/{tarea}/borrador", cuerpo, servicio="sesion"
     )
 
+
+@app.post("/tareas/{tarea_id}/enviar")
+async def enviar_tarea(tarea_id: str, request: Request, datos: EnvioIn):
+    propietario = datos.model_dump(exclude={"anotacion"})
+    error = await validar_candado(request, tarea_id, propietario)
+    if error is not None:
+        return error
+
+    tarea = quote(tarea_id, safe="")
+    respuesta = await reenviar(
+        request, "POST", f"/tareas/{tarea}/transicion",
+        {**datos.model_dump(), "accion": "enviar"},
+    )
+    if respuesta.status_code == 200:
+        await cerrar_lock(request, tarea_id, propietario)
+    return respuesta
+
+
 @app.post("/sesiones/recuperar")
 async def recuperar_sesion(request: Request, datos: dict):
     return await reenviar(
         request, "POST", "/sesiones/recuperar", datos, servicio="sesion"
+    )
+    
+
+
+class RevisionIn(BaseModel):
+    accion: Literal["iniciar_revision", "aprobar", "rechazar"]
+    revisor_id: str = Field(min_length=1)
+    motivo: str | None = None
+
+
+@app.post("/tareas/{tarea_id}/revision")
+async def revisar_tarea(tarea_id: str, request: Request, datos: RevisionIn):
+    tarea = quote(tarea_id, safe="")
+    return await reenviar(
+        request,
+        "POST",
+        f"/tareas/{tarea}/transicion",
+        datos.model_dump(exclude_none=True),
     )
