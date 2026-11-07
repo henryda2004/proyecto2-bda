@@ -16,6 +16,7 @@ import json
 import logging 
 from contextlib import asynccontextmanager
 from urllib.parse import quote
+from pydantic import BaseModel, Field
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request, Response
@@ -197,12 +198,40 @@ async def liberar_tarea(tarea_id: str, request: Request, datos: dict):
     if respuesta.status_code == 200:
         await cerrar_lock(request, tarea_id, datos)
     return respuesta
-@app.put("/tareas/{tarea_id}/borrador")
-async def guardar_borrador(tarea_id: str, request: Request, datos: dict):
-    ruta = f"/tareas/{quote(tarea_id, safe='')}/borrador"
-    return await reenviar(request, "PUT", ruta, datos, servicio="sesion")
+class BorradorIn(BaseModel):
+    anotador_id: str = Field(min_length=1)
+    token: str = Field(min_length=1)
+    borrador: dict
 
+
+@app.put("/tareas/{tarea_id}/borrador")
+async def guardar_borrador(tarea_id: str, request: Request, datos: BorradorIn):
+    propietario = datos.model_dump(exclude={"borrador"})
+    sesion = await reenviar(
+        request, "POST", "/sesiones/recuperar", propietario, servicio="sesion"
+    )
+    if sesion.status_code == 404:
+        return JSONResponse(status_code=409, content={"detail": "La sesión no está vigente"})
+    if sesion.status_code != 200:
+        return sesion
+    if json.loads(sesion.body)["tarea"]["id"] != tarea_id:
+        return JSONResponse(status_code=409, content={"detail": "El candado es de otra tarea"})
+
+    tarea = quote(tarea_id, safe="")
+    plazo = await reenviar(
+        request, "POST", f"/tareas/{tarea}/transicion",
+        {**propietario, "accion": "renovar"},
+    )
+    if plazo.status_code != 200:
+        return plazo
+
+    cuerpo = {**datos.model_dump(), "vence_en": json.loads(plazo.body)["vence_en"]}
+    return await reenviar(
+        request, "PUT", f"/tareas/{tarea}/borrador", cuerpo, servicio="sesion"
+    )
 
 @app.post("/sesiones/recuperar")
 async def recuperar_sesion(request: Request, datos: dict):
-    return await reenviar(request, "POST", "/sesiones/recuperar", datos, servicio="sesion")
+    return await reenviar(
+        request, "POST", "/sesiones/recuperar", datos, servicio="sesion"
+    )

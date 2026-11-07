@@ -179,9 +179,10 @@ async def cerrar_sesion(tarea_id: str, request: Request, datos: Propietario):
 
 class BorradorIn(Propietario):
     borrador: dict
+    vence_en: AwareDatetime
 
 
-# Comprueba el candado y guarda o lee el borrador en una sola operación.
+# Valida al propietario y renueva el candado al guardar el borrador.
 BORRADOR = """
 local token, anotador, tarea, contenido = ARGV[1], ARGV[2], ARGV[3], ARGV[4]
 if redis.call('GET', KEYS[1]) ~= token
@@ -189,30 +190,46 @@ if redis.call('GET', KEYS[1]) ~= token
     or redis.call('HGET', KEYS[2], 'tarea_id') ~= tarea then
     return nil
 end
+
 local ttl = redis.call('PTTL', KEYS[1])
 if ttl <= 0 then
     return nil
 end
+
+local tiempo = redis.call('TIME')
+local ahora = tiempo[1] * 1000 + math.floor(tiempo[2] / 1000)
+local vence = ahora + ttl
+
 if contenido ~= '' then
+    local plazo = math.min(tonumber(ARGV[5]), ahora + 120000)
+    if plazo <= ahora then
+        return nil
+    end
+    vence = math.max(vence, plazo)
+    local editando = 'editando:' .. redis.call('HGET', KEYS[2], 'proyecto_id')
     redis.call('HSET', KEYS[3], 'anotador_id', anotador, 'contenido', contenido)
     redis.call('PERSIST', KEYS[3])
+    redis.call('PEXPIREAT', KEYS[1], vence)
+    redis.call('PEXPIREAT', KEYS[2], vence)
+    redis.call('ZREMRANGEBYSCORE', editando, '-inf', ahora)
+    redis.call('ZADD', editando, vence, anotador)
+    redis.call('PEXPIRE', editando, 120000)
 end
+
 local borrador = ''
 if redis.call('HGET', KEYS[3], 'anotador_id') == anotador then
     borrador = redis.call('HGET', KEYS[3], 'contenido') or ''
 end
-local tiempo = redis.call('TIME')
-local vence = tiempo[1] * 1000 + math.floor(tiempo[2] / 1000) + ttl
 return {redis.call('HGET', KEYS[2], 'tarea'),
     redis.call('HGET', KEYS[2], 'etapa'), borrador, vence}
 """
 
 
-async def operar_borrador(request, tarea_id, datos, contenido=""):
+async def operar_borrador(request, tarea_id, datos, contenido="", vence_en_ms=0):
     resultado = await request.app.state.valkey.eval(
         BORRADOR, 3,
         f"lock:tarea:{tarea_id}", f"sesion:{datos.anotador_id}", f"borrador:{tarea_id}",
-        datos.token, datos.anotador_id, tarea_id, contenido,
+        datos.token, datos.anotador_id, tarea_id, contenido, vence_en_ms,
     )
     if resultado is None:
         raise HTTPException(409, "El token o el candado no está vigente")
@@ -233,7 +250,9 @@ async def guardar_borrador(tarea_id: str, request: Request, datos: BorradorIn):
         "datos": datos.borrador,
         "actualizado_en": datetime.now(timezone.utc).isoformat(),
     })
-    return await operar_borrador(request, tarea_id, datos, contenido)
+    return await operar_borrador(
+        request, tarea_id, datos, contenido, int(datos.vence_en.timestamp() * 1000)
+    )
 
 
 @app.post("/sesiones/recuperar")

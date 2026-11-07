@@ -57,7 +57,7 @@ class SiguienteIn(BaseModel):
 
 
 class TransicionIn(BaseModel):
-    accion: Literal["enviar", "iniciar_revision", "aprobar", "rechazar", "liberar"]
+    accion: Literal["enviar", "iniciar_revision", "aprobar", "rechazar", "liberar","renovar"]
     anotador_id: str | None = None
     token: str | None = None
     revisor_id: str | None = None
@@ -79,6 +79,7 @@ REQUERIDOS = {
     "iniciar_revision": ["revisor_id"],
     "aprobar": ["revisor_id"],
     "rechazar": ["revisor_id", "motivo"],
+    "renovar": ["anotador_id", "token"],
 }
 
 def construir_evento(tarea, version, estado, evento_id, ahora, **extra):
@@ -283,7 +284,27 @@ def transicion(tarea_id: str, datos: TransicionIn):
             status_code=422,
             detail=f"Faltan campos para {datos.accion}: {faltantes}",
         )
-
+    if datos.accion == "renovar":
+        filtro = {
+            "_id": tarea_id,
+            "estado": "abierta",
+            "asignacion.anotador_id": datos.anotador_id,
+            "asignacion.token": datos.token,
+            "$expr": {"$gt": ["$asignacion.vence_en", "$$NOW"]},
+        }
+        plazo = {"$max": ["$asignacion.vence_en", {"$add": ["$$NOW", 120_000]}]}
+        tarea = db.tareas.find_one_and_update(
+            filtro,
+            [{"$set": {"asignacion.vence_en": plazo}}],
+            projection={"_id": 0, "asignacion.vence_en": 1},
+            return_document=ReturnDocument.AFTER,
+        )
+        if tarea is None:
+            if db.tareas.find_one({"_id": tarea_id}, {"_id": 1}) is None:
+                raise HTTPException(404, "La tarea no existe")
+            raise HTTPException(409, "La asignación no está vigente")
+        return {"tarea_id": tarea_id, "vence_en": tarea["asignacion"]["vence_en"]}
+    
     regla = TRANSICIONES[datos.accion]
     ahora = datetime.now(timezone.utc)
     evento_id = str(uuid.uuid4())
