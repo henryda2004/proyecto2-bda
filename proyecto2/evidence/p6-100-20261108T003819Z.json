@@ -1,0 +1,184 @@
+{
+  "gateway": "http://localhost:8000",
+  "modalidad": "texto",
+  "semilla": 2026,
+  "usuarios": 100,
+  "calentamiento_seg": 30,
+  "duracion_seg": 90,
+  "corridas": [
+    {
+      "inicio_utc": "2026-11-08T00:38:20.345899+00:00",
+      "envios_confirmados": 1068,
+      "envios_por_minuto": 712.0,
+      "errores": 0,
+      "endpoints": {
+        "GET /proyectos/{proyecto_id}/exportar?limite=10": {
+          "muestras": 1124,
+          "codigos": {
+            "200": 1124
+          },
+          "errores": 0,
+          "p50_ms": 469.075,
+          "p95_ms": 594.644,
+          "p99_ms": 640.848
+        },
+        "POST /tareas/siguiente": {
+          "muestras": 1131,
+          "codigos": {
+            "200": 1131
+          },
+          "errores": 0,
+          "p50_ms": 779.096,
+          "p95_ms": 1124.988,
+          "p99_ms": 1234.01
+        },
+        "POST /tareas/{tarea_id}/enviar": {
+          "muestras": 1068,
+          "codigos": {
+            "200": 1068
+          },
+          "errores": 0,
+          "p50_ms": 1317.222,
+          "p95_ms": 1652.152,
+          "p99_ms": 1964.931
+        },
+        "POST /tareas/{tarea_id}/revision": {
+          "muestras": 2198,
+          "codigos": {
+            "200": 2198
+          },
+          "errores": 0,
+          "p50_ms": 589.083,
+          "p95_ms": 736.635,
+          "p99_ms": 816.848
+        },
+        "PUT /tareas/{tarea_id}/borrador": {
+          "muestras": 2135,
+          "codigos": {
+            "200": 2135
+          },
+          "errores": 0,
+          "p50_ms": 639.084,
+          "p95_ms": 1819.301,
+          "p99_ms": 2211.333
+        }
+      }
+    },
+    {
+      "inicio_utc": "2026-11-08T00:40:28.956717+00:00",
+      "envios_confirmados": 1065,
+      "envios_por_minuto": 710.0,
+      "errores": 0,
+      "endpoints": {
+        "GET /proyectos/{proyecto_id}/exportar?limite=10": {
+          "muestras": 1068,
+          "codigos": {
+            "200": 1068
+          },
+          "errores": 0,
+          "p50_ms": 459.595,
+          "p95_ms": 563.423,
+          "p99_ms": 775.497
+        },
+        "POST /tareas/siguiente": {
+          "muestras": 1086,
+          "codigos": {
+            "200": 1086
+          },
+          "errores": 0,
+          "p50_ms": 769.809,
+          "p95_ms": 1096.691,
+          "p99_ms": 1645.464
+        },
+        "POST /tareas/{tarea_id}/enviar": {
+          "muestras": 1065,
+          "codigos": {
+            "200": 1065
+          },
+          "errores": 0,
+          "p50_ms": 1325.953,
+          "p95_ms": 1885.988,
+          "p99_ms": 2598.272
+        },
+        "POST /tareas/{tarea_id}/revision": {
+          "muestras": 2132,
+          "codigos": {
+            "200": 2132
+          },
+          "errores": 0,
+          "p50_ms": 589.614,
+          "p95_ms": 701.961,
+          "p99_ms": 916.272
+        },
+        "PUT /tareas/{tarea_id}/borrador": {
+          "muestras": 2153,
+          "codigos": {
+            "200": 2153
+          },
+          "errores": 0,
+          "p50_ms": 629.053,
+          "p95_ms": 1900.915,
+          "p99_ms": 2488.474
+        }
+      }
+    },
+    {
+      "inicio_utc": "2026-11-08T00:42:37.326284+00:00",
+      "envios_confirmados": 1051,
+      "envios_por_minuto": 700.67,
+      "errores": 0,
+      "endpoints": {
+        "GET /proyectos/{proyecto_id}/exportar?limite=10": {
+          "muestras": 1081,
+          "codigos": {
+            "200": 1081
+          },
+          "errores": 0,
+          "p50_ms": 476.386,
+          "p95_ms": 580.623,
+          "p99_ms": 606.132
+        },
+        "POST /tareas/siguiente": {
+          "muestras": 1104,
+          "codigos": {
+            "200": 1104
+          },
+          "errores": 0,
+          "p50_ms": 795.459,
+          "p95_ms": 1038.285,
+          "p99_ms": 1151.04
+        },
+        "POST /tareas/{tarea_id}/enviar": {
+          "muestras": 1051,
+          "codigos": {
+            "200": 1051
+          },
+          "errores": 0,
+          "p50_ms": 1335.727,
+          "p95_ms": 1534.924,
+          "p99_ms": 2057.294
+        },
+        "POST /tareas/{tarea_id}/revision": {
+          "muestras": 2118,
+          "codigos": {
+            "200": 2118
+          },
+          "errores": 0,
+          "p50_ms": 584.124,
+          "p95_ms": 671.628,
+          "p99_ms": 728.857
+        },
+        "PUT /tareas/{tarea_id}/borrador": {
+          "muestras": 2179,
+          "codigos": {
+            "200": 2179
+          },
+          "errores": 0,
+          "p50_ms": 743.024,
+          "p95_ms": 1788.512,
+          "p99_ms": 2130.189
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,496 @@
+Docker=29.7.2 CPU_logicas=12 RAM_bytes=7934787584
+2026-11-08T00:38:20Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                89.35%    436.9MiB / 7.39GiB   5.77%     261MB / 396MB     1.46MB / 1.13GB   128
+e05aa05582c3   mongo2                101.07%   281.7MiB / 7.39GiB   3.72%     236MB / 238MB     2.12MB / 1.19GB   110
+344f7c85d5dc   mongo3                18.70%    271.3MiB / 7.39GiB   3.59%     199MB / 145MB     2.63MB / 1.12GB   110
+5789181111e2   proyecto2-gateway-1   26.51%    44.43MiB / 7.39GiB   0.59%     91MB / 95.2MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    29.16%    33.29MiB / 7.39GiB   0.44%     48.8MB / 84.6MB   0B / 823kB        3
+579e0554efb3   proyecto2-valkey-1    3.32%     12.78MiB / 7.39GiB   0.17%     54.7MB / 28.6MB   24.6MB / 39.8MB   8
+7672beb9f7e8   registro              9.06%     45.18MiB / 7.39GiB   0.60%     129MB / 88MB      0B / 909kB        50
+2026-11-08T00:38:27Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                37.10%    287.2MiB / 7.39GiB   3.80%     262MB / 398MB     1.47MB / 1.13GB   118
+e05aa05582c3   mongo2                23.47%    282MiB / 7.39GiB     3.73%     236MB / 238MB     2.12MB / 1.19GB   110
+344f7c85d5dc   mongo3                23.27%    270MiB / 7.39GiB     3.57%     199MB / 145MB     2.63MB / 1.12GB   110
+5789181111e2   proyecto2-gateway-1   110.69%   45.71MiB / 7.39GiB   0.60%     92.3MB / 96.6MB   0B / 823kB        17
+6616484295af   proyecto2-sesion-1    29.42%    37.59MiB / 7.39GiB   0.50%     50MB / 86.7MB     0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.51%     13.45MiB / 7.39GiB   0.18%     55.9MB / 29.2MB   24.7MB / 41.2MB   7
+7672beb9f7e8   registro              32.66%    45.44MiB / 7.39GiB   0.60%     129MB / 88.6MB    0B / 909kB        50
+2026-11-08T00:38:34Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                33.80%    286.9MiB / 7.39GiB   3.79%     264MB / 402MB     1.48MB / 1.13GB   118
+e05aa05582c3   mongo2                24.58%    281.5MiB / 7.39GiB   3.72%     237MB / 239MB     2.17MB / 1.19GB   110
+344f7c85d5dc   mongo3                26.71%    269.6MiB / 7.39GiB   3.56%     200MB / 146MB     2.63MB / 1.12GB   110
+5789181111e2   proyecto2-gateway-1   104.00%   46.33MiB / 7.39GiB   0.61%     94MB / 98.6MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    24.02%    37.64MiB / 7.39GiB   0.50%     50.6MB / 87.7MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.96%     13.45MiB / 7.39GiB   0.18%     56.6MB / 29.5MB   24.7MB / 41.4MB   7
+7672beb9f7e8   registro              16.95%    44.3MiB / 7.39GiB    0.59%     132MB / 90.5MB    0B / 909kB        27
+2026-11-08T00:38:40Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                52.97%    287.4MiB / 7.39GiB   3.80%     266MB / 407MB     1.49MB / 1.13GB   124
+e05aa05582c3   mongo2                25.54%    281.8MiB / 7.39GiB   3.72%     238MB / 239MB     2.18MB / 1.2GB    109
+344f7c85d5dc   mongo3                25.74%    269.9MiB / 7.39GiB   3.57%     201MB / 146MB     2.79MB / 1.13GB   109
+5789181111e2   proyecto2-gateway-1   111.75%   47.44MiB / 7.39GiB   0.63%     95.7MB / 100MB    0B / 823kB        17
+6616484295af   proyecto2-sesion-1    22.35%    37.72MiB / 7.39GiB   0.50%     51.7MB / 89.5MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.05%     11.64MiB / 7.39GiB   0.15%     57.6MB / 29.9MB   24.7MB / 41.7MB   7
+7672beb9f7e8   registro              60.07%    45.21MiB / 7.39GiB   0.60%     135MB / 92.6MB    0B / 909kB        41
+2026-11-08T00:38:48Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                43.16%    287.1MiB / 7.39GiB   3.79%     267MB / 410MB     1.49MB / 1.13GB   124
+e05aa05582c3   mongo2                27.39%    283MiB / 7.39GiB     3.74%     239MB / 240MB     2.18MB / 1.2GB    109
+344f7c85d5dc   mongo3                99.29%    421.2MiB / 7.39GiB   5.57%     202MB / 147MB     2.79MB / 1.13GB   119
+5789181111e2   proyecto2-gateway-1   111.22%   46.71MiB / 7.39GiB   0.62%     97.8MB / 103MB    0B / 823kB        17
+6616484295af   proyecto2-sesion-1    22.52%    37.75MiB / 7.39GiB   0.50%     52.7MB / 91.3MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.27%     11.64MiB / 7.39GiB   0.15%     58.6MB / 30.5MB   24.7MB / 42MB     7
+7672beb9f7e8   registro              40.53%    45.28MiB / 7.39GiB   0.60%     137MB / 93.8MB    0B / 909kB        41
+2026-11-08T00:38:55Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                33.16%    286.8MiB / 7.39GiB   3.79%     269MB / 414MB     1.49MB / 1.13GB   124
+e05aa05582c3   mongo2                23.77%    283.4MiB / 7.39GiB   3.74%     241MB / 240MB     2.2MB / 1.2GB     109
+344f7c85d5dc   mongo3                23.74%    269.6MiB / 7.39GiB   3.56%     203MB / 148MB     2.81MB / 1.13GB   108
+5789181111e2   proyecto2-gateway-1   103.18%   46.69MiB / 7.39GiB   0.62%     99.8MB / 105MB    0B / 823kB        17
+6616484295af   proyecto2-sesion-1    17.93%    38.01MiB / 7.39GiB   0.50%     53.7MB / 93MB     0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    4.47%     11.62MiB / 7.39GiB   0.15%     59.6MB / 30.9MB   24.8MB / 42.3MB   7
+7672beb9f7e8   registro              20.25%    44.37MiB / 7.39GiB   0.59%     140MB / 95.7MB    0B / 909kB        20
+2026-11-08T00:39:02Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                52.05%    286.4MiB / 7.39GiB   3.78%     271MB / 419MB     1.49MB / 1.14GB   124
+e05aa05582c3   mongo2                26.75%    284.3MiB / 7.39GiB   3.76%     242MB / 241MB     2.28MB / 1.2GB    109
+344f7c85d5dc   mongo3                31.40%    269.3MiB / 7.39GiB   3.56%     204MB / 148MB     2.81MB / 1.13GB   109
+5789181111e2   proyecto2-gateway-1   105.06%   46.98MiB / 7.39GiB   0.62%     102MB / 107MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    19.95%    37.78MiB / 7.39GiB   0.50%     54.6MB / 94.6MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.29%     11.64MiB / 7.39GiB   0.15%     60.6MB / 31.3MB   24.8MB / 42.6MB   7
+7672beb9f7e8   registro              41.97%    44.19MiB / 7.39GiB   0.58%     143MB / 97.8MB    0B / 909kB        22
+2026-11-08T00:39:09Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                48.49%    285.7MiB / 7.39GiB   3.78%     273MB / 422MB     1.49MB / 1.14GB   123
+e05aa05582c3   mongo2                29.97%    285.2MiB / 7.39GiB   3.77%     243MB / 242MB     2.28MB / 1.2GB    109
+344f7c85d5dc   mongo3                29.32%    269.5MiB / 7.39GiB   3.56%     205MB / 149MB     2.81MB / 1.13GB   109
+5789181111e2   proyecto2-gateway-1   109.59%   47.91MiB / 7.39GiB   0.63%     104MB / 109MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    9.89%     37.78MiB / 7.39GiB   0.50%     55.7MB / 96.3MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    1.47%     11.68MiB / 7.39GiB   0.15%     61.8MB / 31.9MB   24.8MB / 42.9MB   7
+7672beb9f7e8   registro              58.51%    44.45MiB / 7.39GiB   0.59%     145MB / 99.6MB    0B / 909kB        26
+2026-11-08T00:39:17Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O         BLOCK I/O         PIDS
+ceb543315655   mongo1                106.64%   285.6MiB / 7.39GiB   3.77%     275MB / 427MB   1.49MB / 1.14GB   124
+e05aa05582c3   mongo2                24.26%    285.9MiB / 7.39GiB   3.78%     244MB / 242MB   2.31MB / 1.21GB   108
+344f7c85d5dc   mongo3                23.87%    269.5MiB / 7.39GiB   3.56%     206MB / 149MB   2.81MB / 1.14GB   108
+5789181111e2   proyecto2-gateway-1   109.68%   47.66MiB / 7.39GiB   0.63%     106MB / 111MB   0B / 823kB        17
+6616484295af   proyecto2-sesion-1    26.85%    37.86MiB / 7.39GiB   0.50%     56.6MB / 98MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.73%     11.77MiB / 7.39GiB   0.16%     63MB / 32.5MB   24.9MB / 43.2MB   7
+7672beb9f7e8   registro              30.80%    44.53MiB / 7.39GiB   0.59%     147MB / 101MB   0B / 909kB        23
+2026-11-08T00:39:24Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                38.38%    284.7MiB / 7.39GiB   3.76%     277MB / 431MB     1.49MB / 1.15GB   123
+e05aa05582c3   mongo2                26.87%    287.4MiB / 7.39GiB   3.80%     245MB / 243MB     2.35MB / 1.22GB   108
+344f7c85d5dc   mongo3                28.82%    270.2MiB / 7.39GiB   3.57%     207MB / 150MB     2.87MB / 1.15GB   108
+5789181111e2   proyecto2-gateway-1   103.23%   47.58MiB / 7.39GiB   0.63%     108MB / 113MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    25.19%    38.13MiB / 7.39GiB   0.50%     57.6MB / 99.7MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    4.25%     11.8MiB / 7.39GiB    0.16%     63.8MB / 32.8MB   24.9MB / 44.9MB   7
+7672beb9f7e8   registro              19.53%    44.47MiB / 7.39GiB   0.59%     150MB / 103MB     0B / 909kB        28
+2026-11-08T00:39:30Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                48.50%    284.5MiB / 7.39GiB   3.76%     279MB / 436MB     1.5MB / 1.15GB    123
+e05aa05582c3   mongo2                30.64%    289.2MiB / 7.39GiB   3.82%     246MB / 243MB     2.38MB / 1.22GB   108
+344f7c85d5dc   mongo3                28.40%    269.9MiB / 7.39GiB   3.57%     208MB / 151MB     2.87MB / 1.15GB   108
+5789181111e2   proyecto2-gateway-1   109.94%   47.96MiB / 7.39GiB   0.63%     109MB / 115MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    23.82%    38.19MiB / 7.39GiB   0.50%     58.7MB / 101MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.28%     11.82MiB / 7.39GiB   0.16%     64.8MB / 33.3MB   24.9MB / 45.2MB   7
+7672beb9f7e8   registro              55.34%    44.27MiB / 7.39GiB   0.59%     153MB / 105MB     0B / 909kB        23
+2026-11-08T00:39:38Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O          BLOCK I/O         PIDS
+ceb543315655   mongo1                61.01%    322.4MiB / 7.39GiB   4.26%     281MB / 439MB    1.5MB / 1.15GB    129
+e05aa05582c3   mongo2                20.78%    290.1MiB / 7.39GiB   3.83%     247MB / 244MB    2.38MB / 1.22GB   108
+344f7c85d5dc   mongo3                29.57%    269.9MiB / 7.39GiB   3.57%     209MB / 151MB    2.87MB / 1.15GB   108
+5789181111e2   proyecto2-gateway-1   110.43%   47.91MiB / 7.39GiB   0.63%     112MB / 118MB    0B / 823kB        17
+6616484295af   proyecto2-sesion-1    15.43%    37.95MiB / 7.39GiB   0.50%     59.8MB / 103MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    1.99%     11.89MiB / 7.39GiB   0.16%     66MB / 33.9MB    25MB / 45.5MB     7
+7672beb9f7e8   registro              53.28%    45.01MiB / 7.39GiB   0.59%     155MB / 106MB    0B / 909kB        32
+2026-11-08T00:39:45Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                31.08%    284.2MiB / 7.39GiB   3.76%     283MB / 444MB     1.5MB / 1.16GB    123
+e05aa05582c3   mongo2                23.08%    289.3MiB / 7.39GiB   3.82%     248MB / 245MB     2.47MB / 1.22GB   107
+344f7c85d5dc   mongo3                36.59%    269.8MiB / 7.39GiB   3.57%     210MB / 152MB     2.89MB / 1.15GB   109
+5789181111e2   proyecto2-gateway-1   102.95%   47.93MiB / 7.39GiB   0.63%     114MB / 120MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    21.27%    38.02MiB / 7.39GiB   0.50%     60.8MB / 105MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.61%     11.95MiB / 7.39GiB   0.16%     66.9MB / 34.3MB   25MB / 45.8MB     7
+7672beb9f7e8   registro              17.42%    44.71MiB / 7.39GiB   0.59%     158MB / 108MB     0B / 909kB        32
+2026-11-08T00:39:52Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                47.87%    283.5MiB / 7.39GiB   3.75%     285MB / 448MB     1.5MB / 1.16GB    123
+e05aa05582c3   mongo2                31.80%    290.5MiB / 7.39GiB   3.84%     249MB / 245MB     2.49MB / 1.23GB   107
+344f7c85d5dc   mongo3                31.24%    269.8MiB / 7.39GiB   3.56%     211MB / 152MB     2.9MB / 1.15GB    109
+5789181111e2   proyecto2-gateway-1   86.61%    47.96MiB / 7.39GiB   0.63%     116MB / 122MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    17.19%    38.03MiB / 7.39GiB   0.50%     61.6MB / 106MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.04%     11.98MiB / 7.39GiB   0.16%     67.9MB / 34.7MB   25MB / 46.1MB     7
+7672beb9f7e8   registro              33.51%    44.25MiB / 7.39GiB   0.58%     161MB / 111MB     0B / 909kB        22
+2026-11-08T00:39:59Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                57.46%    284MiB / 7.39GiB     3.75%     287MB / 452MB     1.5MB / 1.16GB    123
+e05aa05582c3   mongo2                33.38%    289.8MiB / 7.39GiB   3.83%     250MB / 246MB     2.57MB / 1.23GB   107
+344f7c85d5dc   mongo3                33.11%    269.6MiB / 7.39GiB   3.56%     213MB / 153MB     2.9MB / 1.16GB    109
+5789181111e2   proyecto2-gateway-1   111.67%   47.94MiB / 7.39GiB   0.63%     118MB / 124MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    17.00%    38.3MiB / 7.39GiB    0.51%     62.7MB / 108MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    1.73%     12.02MiB / 7.39GiB   0.16%     69.1MB / 35.3MB   25MB / 46.4MB     7
+7672beb9f7e8   registro              60.88%    44.23MiB / 7.39GiB   0.58%     163MB / 112MB     0B / 909kB        21
+2026-11-08T00:40:06Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                37.49%    283.5MiB / 7.39GiB   3.75%     289MB / 456MB     1.5MB / 1.16GB    123
+e05aa05582c3   mongo2                21.89%    290.9MiB / 7.39GiB   3.84%     251MB / 246MB     2.62MB / 1.23GB   107
+344f7c85d5dc   mongo3                59.19%    413.9MiB / 7.39GiB   5.47%     214MB / 154MB     2.9MB / 1.16GB    114
+5789181111e2   proyecto2-gateway-1   110.66%   48.23MiB / 7.39GiB   0.64%     120MB / 126MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    28.48%    38.07MiB / 7.39GiB   0.50%     63.9MB / 110MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.65%     12.09MiB / 7.39GiB   0.16%     70.3MB / 35.9MB   25.1MB / 46.8MB   7
+7672beb9f7e8   registro              27.34%    44.2MiB / 7.39GiB    0.58%     165MB / 114MB     0B / 909kB        21
+2026-11-08T00:40:13Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                147.19%   283.1MiB / 7.39GiB   3.74%     291MB / 461MB     1.5MB / 1.16GB    123
+e05aa05582c3   mongo2                66.58%    290.3MiB / 7.39GiB   3.84%     252MB / 247MB     2.67MB / 1.23GB   106
+344f7c85d5dc   mongo3                27.16%    268.2MiB / 7.39GiB   3.54%     215MB / 154MB     2.9MB / 1.16GB    107
+5789181111e2   proyecto2-gateway-1   103.98%   47.82MiB / 7.39GiB   0.63%     122MB / 129MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    26.18%    38.08MiB / 7.39GiB   0.50%     64.8MB / 112MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    9.62%     12.16MiB / 7.39GiB   0.16%     71.2MB / 36.3MB   25.1MB / 47.1MB   7
+7672beb9f7e8   registro              20.52%    44.21MiB / 7.39GiB   0.58%     168MB / 116MB     0B / 909kB        22
+2026-11-08T00:40:20Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                48.70%    284.4MiB / 7.39GiB   3.76%     293MB / 466MB     1.5MB / 1.18GB    123
+e05aa05582c3   mongo2                32.18%    287.9MiB / 7.39GiB   3.80%     253MB / 247MB     2.67MB / 1.23GB   105
+344f7c85d5dc   mongo3                27.54%    267.7MiB / 7.39GiB   3.54%     216MB / 155MB     2.9MB / 1.16GB    108
+5789181111e2   proyecto2-gateway-1   110.13%   47.89MiB / 7.39GiB   0.63%     124MB / 131MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    23.47%    38.09MiB / 7.39GiB   0.50%     65.8MB / 114MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.43%     12.3MiB / 7.39GiB    0.16%     72.3MB / 36.7MB   25.1MB / 47.3MB   7
+7672beb9f7e8   registro              49.00%    44.45MiB / 7.39GiB   0.59%     171MB / 118MB     0B / 909kB        22
+2026-11-08T00:40:27Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                47.26%    284.6MiB / 7.39GiB   3.76%     295MB / 470MB     1.5MB / 1.18GB    123
+e05aa05582c3   mongo2                31.16%    286.5MiB / 7.39GiB   3.79%     254MB / 248MB     2.67MB / 1.25GB   105
+344f7c85d5dc   mongo3                27.71%    269.4MiB / 7.39GiB   3.56%     217MB / 156MB     2.9MB / 1.18GB    108
+5789181111e2   proyecto2-gateway-1   100.69%   48.07MiB / 7.39GiB   0.64%     126MB / 133MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    3.19%     38.84MiB / 7.39GiB   0.51%     66.6MB / 115MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    0.82%     12.31MiB / 7.39GiB   0.16%     73.1MB / 37.2MB   25.1MB / 49.1MB   7
+7672beb9f7e8   registro              41.46%    44.46MiB / 7.39GiB   0.59%     174MB / 120MB     0B / 909kB        22
+2026-11-08T00:40:34Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                36.44%    283.8MiB / 7.39GiB   3.75%     296MB / 472MB     1.5MB / 1.18GB    123
+e05aa05582c3   mongo2                64.79%    429.7MiB / 7.39GiB   5.68%     255MB / 249MB     2.67MB / 1.25GB   111
+344f7c85d5dc   mongo3                26.58%    267.7MiB / 7.39GiB   3.54%     218MB / 156MB     2.9MB / 1.18GB    108
+5789181111e2   proyecto2-gateway-1   102.51%   47.94MiB / 7.39GiB   0.63%     127MB / 134MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    23.20%    38.12MiB / 7.39GiB   0.50%     67.5MB / 117MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    9.11%     12.31MiB / 7.39GiB   0.16%     74.1MB / 37.7MB   25.2MB / 49.4MB   7
+7672beb9f7e8   registro              20.36%    44.2MiB / 7.39GiB    0.58%     175MB / 120MB     0B / 909kB        22
+2026-11-08T00:40:40Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                34.04%    283.7MiB / 7.39GiB   3.75%     298MB / 477MB     1.5MB / 1.18GB    122
+e05aa05582c3   mongo2                25.66%    285MiB / 7.39GiB     3.77%     256MB / 249MB     2.67MB / 1.25GB   104
+344f7c85d5dc   mongo3                65.71%    267.6MiB / 7.39GiB   3.54%     219MB / 157MB     2.9MB / 1.18GB    108
+5789181111e2   proyecto2-gateway-1   55.13%    47.69MiB / 7.39GiB   0.63%     129MB / 136MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    29.16%    38.15MiB / 7.39GiB   0.50%     68.4MB / 118MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    4.43%     12.34MiB / 7.39GiB   0.16%     75.1MB / 38.1MB   25.2MB / 49.8MB   7
+7672beb9f7e8   registro              19.50%    44.28MiB / 7.39GiB   0.59%     178MB / 122MB     0B / 909kB        24
+2026-11-08T00:40:48Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                51.84%    283.1MiB / 7.39GiB   3.74%     300MB / 482MB     1.5MB / 1.19GB    122
+e05aa05582c3   mongo2                31.18%    284.4MiB / 7.39GiB   3.76%     257MB / 250MB     2.67MB / 1.25GB   104
+344f7c85d5dc   mongo3                31.19%    266.8MiB / 7.39GiB   3.53%     220MB / 157MB     2.9MB / 1.18GB    106
+5789181111e2   proyecto2-gateway-1   108.38%   47.77MiB / 7.39GiB   0.63%     131MB / 139MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    24.44%    38.16MiB / 7.39GiB   0.50%     69.5MB / 120MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.61%     12.36MiB / 7.39GiB   0.16%     76.1MB / 38.5MB   25.2MB / 50MB     7
+7672beb9f7e8   registro              62.70%    44.2MiB / 7.39GiB    0.58%     181MB / 124MB     0B / 909kB        21
+2026-11-08T00:40:55Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                38.07%    282.6MiB / 7.39GiB   3.74%     302MB / 485MB     1.5MB / 1.19GB    123
+e05aa05582c3   mongo2                32.16%    284.4MiB / 7.39GiB   3.76%     258MB / 251MB     2.67MB / 1.25GB   104
+344f7c85d5dc   mongo3                31.99%    267MiB / 7.39GiB     3.53%     221MB / 158MB     2.9MB / 1.19GB    106
+5789181111e2   proyecto2-gateway-1   110.61%   48.64MiB / 7.39GiB   0.64%     133MB / 141MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    18.57%    38.18MiB / 7.39GiB   0.50%     70.6MB / 122MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    2.44%     12.38MiB / 7.39GiB   0.16%     77.3MB / 39.1MB   25.3MB / 50.4MB   7
+7672beb9f7e8   registro              49.37%    44.23MiB / 7.39GiB   0.58%     183MB / 126MB     0B / 909kB        22
+2026-11-08T00:41:02Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                37.51%    282.8MiB / 7.39GiB   3.74%     304MB / 489MB     1.5MB / 1.19GB    123
+e05aa05582c3   mongo2                26.05%    284MiB / 7.39GiB     3.75%     259MB / 251MB     2.67MB / 1.26GB   104
+344f7c85d5dc   mongo3                31.71%    269.6MiB / 7.39GiB   3.56%     222MB / 158MB     2.9MB / 1.19GB    113
+5789181111e2   proyecto2-gateway-1   102.76%   47.64MiB / 7.39GiB   0.63%     135MB / 143MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    22.20%    38.17MiB / 7.39GiB   0.50%     71.4MB / 123MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.60%     12.43MiB / 7.39GiB   0.16%     78.2MB / 39.5MB   25.3MB / 50.7MB   7
+7672beb9f7e8   registro              22.99%    44.18MiB / 7.39GiB   0.58%     185MB / 128MB     0B / 909kB        21
+2026-11-08T00:41:08Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O          BLOCK I/O         PIDS
+ceb543315655   mongo1                116.58%   282.7MiB / 7.39GiB   3.74%     306MB / 494MB    1.5MB / 1.19GB    123
+e05aa05582c3   mongo2                21.16%    284.7MiB / 7.39GiB   3.76%     260MB / 252MB    2.67MB / 1.26GB   104
+344f7c85d5dc   mongo3                19.01%    266.5MiB / 7.39GiB   3.52%     223MB / 159MB    2.9MB / 1.19GB    106
+5789181111e2   proyecto2-gateway-1   53.31%    48MiB / 7.39GiB      0.63%     137MB / 145MB    0B / 823kB        17
+6616484295af   proyecto2-sesion-1    14.82%    38.46MiB / 7.39GiB   0.51%     72.4MB / 125MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.57%     12.44MiB / 7.39GiB   0.16%     79MB / 39.9MB    25.3MB / 50.9MB   7
+7672beb9f7e8   registro              17.29%    44.27MiB / 7.39GiB   0.59%     189MB / 130MB    0B / 909kB        24
+2026-11-08T00:41:16Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                56.30%    282.8MiB / 7.39GiB   3.74%     308MB / 499MB     1.5MB / 1.2GB     123
+e05aa05582c3   mongo2                31.29%    284.2MiB / 7.39GiB   3.76%     262MB / 252MB     2.67MB / 1.26GB   103
+344f7c85d5dc   mongo3                32.22%    266.1MiB / 7.39GiB   3.52%     224MB / 160MB     2.9MB / 1.19GB    105
+5789181111e2   proyecto2-gateway-1   111.24%   47.96MiB / 7.39GiB   0.63%     139MB / 147MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    9.90%     38.21MiB / 7.39GiB   0.51%     73.4MB / 127MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    7.16%     12.47MiB / 7.39GiB   0.16%     80.1MB / 40.5MB   25.3MB / 51.3MB   7
+7672beb9f7e8   registro              58.04%    44.3MiB / 7.39GiB    0.59%     191MB / 132MB     0B / 909kB        24
+2026-11-08T00:41:23Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O          BLOCK I/O         PIDS
+ceb543315655   mongo1                37.47%    285.1MiB / 7.39GiB   3.77%     310MB / 502MB    1.5MB / 1.21GB    123
+e05aa05582c3   mongo2                24.58%    284.7MiB / 7.39GiB   3.76%     263MB / 253MB    2.67MB / 1.26GB   103
+344f7c85d5dc   mongo3                25.66%    266.2MiB / 7.39GiB   3.52%     225MB / 160MB    2.9MB / 1.2GB     105
+5789181111e2   proyecto2-gateway-1   111.03%   47.87MiB / 7.39GiB   0.63%     140MB / 149MB    0B / 823kB        17
+6616484295af   proyecto2-sesion-1    24.59%    38.29MiB / 7.39GiB   0.51%     74.5MB / 129MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.06%     12.53MiB / 7.39GiB   0.17%     81.3MB / 41MB    25.4MB / 51.6MB   7
+7672beb9f7e8   registro              28.07%    44.16MiB / 7.39GiB   0.58%     193MB / 133MB    0B / 909kB        20
+2026-11-08T00:41:30Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                32.36%    285.8MiB / 7.39GiB   3.78%     312MB / 506MB     1.5MB / 1.21GB    124
+e05aa05582c3   mongo2                107.56%   440.7MiB / 7.39GiB   5.82%     264MB / 253MB     2.67MB / 1.28GB   116
+344f7c85d5dc   mongo3                25.43%    268.1MiB / 7.39GiB   3.54%     226MB / 161MB     2.9MB / 1.21GB    104
+5789181111e2   proyecto2-gateway-1   103.19%   48.04MiB / 7.39GiB   0.63%     142MB / 151MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    14.25%    38.25MiB / 7.39GiB   0.51%     75.2MB / 130MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    4.17%     12.58MiB / 7.39GiB   0.17%     82.3MB / 41.4MB   25.4MB / 53.6MB   7
+7672beb9f7e8   registro              14.81%    44.28MiB / 7.39GiB   0.59%     196MB / 135MB     0B / 909kB        24
+2026-11-08T00:41:37Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                50.73%    286.8MiB / 7.39GiB   3.79%     314MB / 511MB     1.5MB / 1.21GB    124
+e05aa05582c3   mongo2                27.96%    285MiB / 7.39GiB     3.77%     265MB / 254MB     2.67MB / 1.28GB   103
+344f7c85d5dc   mongo3                137.68%   433.8MiB / 7.39GiB   5.73%     227MB / 161MB     2.9MB / 1.21GB    120
+5789181111e2   proyecto2-gateway-1   109.37%   47.9MiB / 7.39GiB    0.63%     145MB / 154MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    22.23%    38.28MiB / 7.39GiB   0.51%     76.4MB / 132MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.13%     12.62MiB / 7.39GiB   0.17%     83.3MB / 41.9MB   25.4MB / 53.9MB   7
+7672beb9f7e8   registro              51.39%    44.29MiB / 7.39GiB   0.59%     199MB / 137MB     0B / 909kB        24
+2026-11-08T00:41:44Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                39.99%    287.9MiB / 7.39GiB   3.81%     315MB / 514MB     1.5MB / 1.22GB    124
+e05aa05582c3   mongo2                26.35%    284.6MiB / 7.39GiB   3.76%     266MB / 255MB     2.67MB / 1.28GB   102
+344f7c85d5dc   mongo3                27.81%    267.1MiB / 7.39GiB   3.53%     228MB / 162MB     2.9MB / 1.21GB    104
+5789181111e2   proyecto2-gateway-1   103.39%   47.82MiB / 7.39GiB   0.63%     146MB / 155MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    18.63%    38.77MiB / 7.39GiB   0.51%     77.4MB / 134MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.29%     12.64MiB / 7.39GiB   0.17%     84.3MB / 42.4MB   25.5MB / 54.2MB   7
+7672beb9f7e8   registro              24.12%    44.28MiB / 7.39GiB   0.59%     200MB / 138MB     0B / 909kB        24
+2026-11-08T00:41:51Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                32.32%    289.2MiB / 7.39GiB   3.82%     317MB / 518MB     1.5MB / 1.22GB    125
+e05aa05582c3   mongo2                25.77%    284.9MiB / 7.39GiB   3.76%     267MB / 255MB     2.67MB / 1.28GB   105
+344f7c85d5dc   mongo3                25.89%    265.2MiB / 7.39GiB   3.51%     229MB / 163MB     2.9MB / 1.22GB    103
+5789181111e2   proyecto2-gateway-1   104.46%   47.72MiB / 7.39GiB   0.63%     148MB / 157MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    23.98%    38.56MiB / 7.39GiB   0.51%     78.3MB / 135MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    6.05%     15.26MiB / 7.39GiB   0.20%     85.4MB / 42.9MB   25.5MB / 54.6MB   14
+7672beb9f7e8   registro              21.32%    44.53MiB / 7.39GiB   0.59%     203MB / 140MB     0B / 909kB        29
+2026-11-08T00:41:58Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                51.90%    291MiB / 7.39GiB     3.85%     320MB / 524MB     1.5MB / 1.22GB    124
+e05aa05582c3   mongo2                31.86%    284.5MiB / 7.39GiB   3.76%     268MB / 256MB     2.67MB / 1.28GB   105
+344f7c85d5dc   mongo3                33.61%    265MiB / 7.39GiB     3.50%     230MB / 163MB     2.9MB / 1.22GB    103
+5789181111e2   proyecto2-gateway-1   103.42%   47.71MiB / 7.39GiB   0.63%     150MB / 160MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    23.85%    38.33MiB / 7.39GiB   0.51%     79.3MB / 137MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.86%     12.73MiB / 7.39GiB   0.17%     86.3MB / 43.3MB   25.5MB / 54.9MB   7
+7672beb9f7e8   registro              40.79%    44.33MiB / 7.39GiB   0.59%     206MB / 142MB     0B / 909kB        24
+2026-11-08T00:42:05Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                77.38%    290.7MiB / 7.39GiB   3.84%     321MB / 527MB     1.5MB / 1.22GB    124
+e05aa05582c3   mongo2                33.81%    284.8MiB / 7.39GiB   3.76%     269MB / 256MB     2.67MB / 1.29GB   105
+344f7c85d5dc   mongo3                33.99%    265.5MiB / 7.39GiB   3.51%     232MB / 164MB     2.9MB / 1.22GB    103
+5789181111e2   proyecto2-gateway-1   110.70%   48.15MiB / 7.39GiB   0.64%     152MB / 162MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    25.64%    38.36MiB / 7.39GiB   0.51%     80.2MB / 139MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    2.03%     12.76MiB / 7.39GiB   0.17%     87.5MB / 43.9MB   25.5MB / 55.2MB   7
+7672beb9f7e8   registro              53.11%    44.28MiB / 7.39GiB   0.59%     208MB / 144MB     0B / 909kB        22
+2026-11-08T00:42:12Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                35.34%    291.2MiB / 7.39GiB   3.85%     324MB / 532MB     1.5MB / 1.23GB    123
+e05aa05582c3   mongo2                24.33%    284.4MiB / 7.39GiB   3.76%     270MB / 257MB     2.67MB / 1.29GB   105
+344f7c85d5dc   mongo3                25.18%    265.5MiB / 7.39GiB   3.51%     233MB / 164MB     2.9MB / 1.22GB    103
+5789181111e2   proyecto2-gateway-1   111.43%   48.2MiB / 7.39GiB    0.64%     154MB / 164MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    26.65%    38.67MiB / 7.39GiB   0.51%     81.4MB / 141MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    8.40%     12.81MiB / 7.39GiB   0.17%     88.6MB / 44.4MB   25.6MB / 55.5MB   7
+7672beb9f7e8   registro              28.27%    44.2MiB / 7.39GiB    0.58%     211MB / 146MB     0B / 909kB        21
+2026-11-08T00:42:20Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                32.98%    291.8MiB / 7.39GiB   3.86%     326MB / 536MB     1.5MB / 1.23GB    122
+e05aa05582c3   mongo2                24.53%    284.6MiB / 7.39GiB   3.76%     271MB / 258MB     2.67MB / 1.29GB   103
+344f7c85d5dc   mongo3                23.78%    265.4MiB / 7.39GiB   3.51%     234MB / 165MB     2.9MB / 1.22GB    104
+5789181111e2   proyecto2-gateway-1   100.46%   47.93MiB / 7.39GiB   0.63%     156MB / 166MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    24.84%    38.37MiB / 7.39GiB   0.51%     82.4MB / 142MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    4.34%     12.84MiB / 7.39GiB   0.17%     89.6MB / 44.8MB   25.6MB / 55.8MB   7
+7672beb9f7e8   registro              15.87%    44.53MiB / 7.39GiB   0.59%     214MB / 148MB     0B / 909kB        29
+2026-11-08T00:42:27Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                165.09%   295.3MiB / 7.39GiB   3.90%     328MB / 541MB     1.5MB / 1.25GB    123
+e05aa05582c3   mongo2                33.50%    286MiB / 7.39GiB     3.78%     272MB / 258MB     2.67MB / 1.31GB   103
+344f7c85d5dc   mongo3                29.37%    273.1MiB / 7.39GiB   3.61%     235MB / 166MB     2.9MB / 1.24GB    104
+5789181111e2   proyecto2-gateway-1   108.11%   47.77MiB / 7.39GiB   0.63%     158MB / 169MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    25.02%    38.41MiB / 7.39GiB   0.51%     83.4MB / 144MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.78%     12.88MiB / 7.39GiB   0.17%     90.7MB / 45.3MB   25.6MB / 58MB     7
+7672beb9f7e8   registro              45.32%    44.38MiB / 7.39GiB   0.59%     217MB / 150MB     0B / 909kB        25
+2026-11-08T00:42:34Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                41.00%    295.9MiB / 7.39GiB   3.91%     329MB / 544MB     1.5MB / 1.25GB    123
+e05aa05582c3   mongo2                25.22%    285.2MiB / 7.39GiB   3.77%     273MB / 259MB     2.67MB / 1.31GB   103
+344f7c85d5dc   mongo3                26.33%    269.8MiB / 7.39GiB   3.57%     236MB / 166MB     2.9MB / 1.24GB    104
+5789181111e2   proyecto2-gateway-1   111.40%   47.96MiB / 7.39GiB   0.63%     160MB / 170MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    22.43%    38.41MiB / 7.39GiB   0.51%     84.4MB / 146MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    2.89%     12.91MiB / 7.39GiB   0.17%     91.7MB / 45.9MB   25.7MB / 58.3MB   7
+7672beb9f7e8   registro              36.64%    44.68MiB / 7.39GiB   0.59%     219MB / 151MB     0B / 909kB        25
+2026-11-08T00:42:40Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                32.90%    295.2MiB / 7.39GiB   3.90%     331MB / 548MB     1.5MB / 1.25GB    123
+e05aa05582c3   mongo2                24.65%    285.6MiB / 7.39GiB   3.77%     274MB / 259MB     2.67MB / 1.31GB   103
+344f7c85d5dc   mongo3                23.92%    269.6MiB / 7.39GiB   3.56%     237MB / 167MB     2.9MB / 1.25GB    104
+5789181111e2   proyecto2-gateway-1   102.47%   47.68MiB / 7.39GiB   0.63%     162MB / 172MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    19.39%    38.39MiB / 7.39GiB   0.51%     85.2MB / 147MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    2.88%     12.94MiB / 7.39GiB   0.17%     92.4MB / 46.1MB   25.7MB / 58.5MB   7
+7672beb9f7e8   registro              18.57%    44.22MiB / 7.39GiB   0.58%     221MB / 153MB     0B / 909kB        22
+2026-11-08T00:42:48Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                18.69%    295.2MiB / 7.39GiB   3.90%     333MB / 552MB     1.5MB / 1.25GB    125
+e05aa05582c3   mongo2                28.00%    287.1MiB / 7.39GiB   3.79%     275MB / 260MB     2.67MB / 1.32GB   110
+344f7c85d5dc   mongo3                14.49%    269.9MiB / 7.39GiB   3.57%     238MB / 167MB     2.9MB / 1.25GB    111
+5789181111e2   proyecto2-gateway-1   50.98%    47.78MiB / 7.39GiB   0.63%     164MB / 174MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    13.55%    38.67MiB / 7.39GiB   0.51%     86.1MB / 148MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    8.75%     12.95MiB / 7.39GiB   0.17%     93.4MB / 46.6MB   25.7MB / 58.9MB   7
+7672beb9f7e8   registro              8.80%     44.22MiB / 7.39GiB   0.58%     224MB / 155MB     0B / 909kB        23
+2026-11-08T00:42:55Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                63.19%    294.7MiB / 7.39GiB   3.90%     335MB / 556MB     1.5MB / 1.25GB    125
+e05aa05582c3   mongo2                35.66%    287MiB / 7.39GiB     3.79%     276MB / 261MB     2.67MB / 1.32GB   109
+344f7c85d5dc   mongo3                71.15%    269.5MiB / 7.39GiB   3.56%     239MB / 168MB     2.9MB / 1.25GB    111
+5789181111e2   proyecto2-gateway-1   110.18%   48.55MiB / 7.39GiB   0.64%     165MB / 176MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    9.68%     38.41MiB / 7.39GiB   0.51%     87.1MB / 150MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    1.68%     12.99MiB / 7.39GiB   0.17%     94.4MB / 47.1MB   25.7MB / 59.1MB   7
+7672beb9f7e8   registro              67.58%    44.28MiB / 7.39GiB   0.59%     226MB / 156MB     0B / 909kB        23
+2026-11-08T00:43:03Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                38.19%    295.2MiB / 7.39GiB   3.90%     336MB / 559MB     1.5MB / 1.25GB    125
+e05aa05582c3   mongo2                26.74%    287.8MiB / 7.39GiB   3.80%     277MB / 261MB     2.67MB / 1.32GB   109
+344f7c85d5dc   mongo3                28.00%    270.9MiB / 7.39GiB   3.58%     240MB / 168MB     2.9MB / 1.25GB    111
+5789181111e2   proyecto2-gateway-1   108.63%   47.97MiB / 7.39GiB   0.63%     167MB / 178MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    28.44%    38.46MiB / 7.39GiB   0.51%     88.1MB / 152MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    4.30%     13.04MiB / 7.39GiB   0.17%     95.5MB / 47.6MB   25.8MB / 59.4MB   7
+7672beb9f7e8   registro              23.52%    44.24MiB / 7.39GiB   0.58%     228MB / 157MB     0B / 909kB        23
+2026-11-08T00:43:10Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                28.97%    294.7MiB / 7.39GiB   3.89%     338MB / 564MB     1.5MB / 1.26GB    125
+e05aa05582c3   mongo2                21.82%    287.2MiB / 7.39GiB   3.80%     278MB / 262MB     2.67MB / 1.32GB   109
+344f7c85d5dc   mongo3                21.76%    271.4MiB / 7.39GiB   3.59%     241MB / 169MB     2.9MB / 1.25GB    111
+5789181111e2   proyecto2-gateway-1   108.00%   47.79MiB / 7.39GiB   0.63%     169MB / 180MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    30.52%    38.46MiB / 7.39GiB   0.51%     89MB / 153MB      0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.56%     13.11MiB / 7.39GiB   0.17%     96.2MB / 47.9MB   25.8MB / 59.7MB   7
+7672beb9f7e8   registro              18.65%    44.31MiB / 7.39GiB   0.59%     231MB / 159MB     0B / 909kB        25
+2026-11-08T00:43:17Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                40.53%    294.7MiB / 7.39GiB   3.89%     340MB / 568MB     1.5MB / 1.26GB    123
+e05aa05582c3   mongo2                24.32%    286.7MiB / 7.39GiB   3.79%     279MB / 262MB     2.67MB / 1.32GB   108
+344f7c85d5dc   mongo3                29.22%    272.4MiB / 7.39GiB   3.60%     242MB / 169MB     2.9MB / 1.26GB    110
+5789181111e2   proyecto2-gateway-1   96.58%    47.79MiB / 7.39GiB   0.63%     171MB / 183MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    23.00%    38.49MiB / 7.39GiB   0.51%     90MB / 155MB      0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    2.88%     13.25MiB / 7.39GiB   0.18%     97.4MB / 48.4MB   25.8MB / 60.1MB   7
+7672beb9f7e8   registro              38.60%    44.57MiB / 7.39GiB   0.59%     234MB / 162MB     0B / 909kB        30
+2026-11-08T00:43:24Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O         BLOCK I/O         PIDS
+ceb543315655   mongo1                149.69%   299.2MiB / 7.39GiB   3.95%     342MB / 571MB   1.5MB / 1.28GB    123
+e05aa05582c3   mongo2                28.62%    287MiB / 7.39GiB     3.79%     280MB / 263MB   2.67MB / 1.33GB   108
+344f7c85d5dc   mongo3                26.98%    272.8MiB / 7.39GiB   3.60%     243MB / 170MB   2.9MB / 1.26GB    110
+5789181111e2   proyecto2-gateway-1   110.91%   48.32MiB / 7.39GiB   0.64%     173MB / 184MB   0B / 823kB        17
+6616484295af   proyecto2-sesion-1    27.11%    38.5MiB / 7.39GiB    0.51%     91MB / 157MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.52%     13.28MiB / 7.39GiB   0.18%     98.5MB / 49MB   25.9MB / 60.3MB   7
+7672beb9f7e8   registro              38.50%    44.87MiB / 7.39GiB   0.59%     235MB / 163MB   0B / 909kB        30
+2026-11-08T00:43:31Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O           BLOCK I/O         PIDS
+ceb543315655   mongo1                34.03%    299.2MiB / 7.39GiB   3.95%     344MB / 576MB     1.5MB / 1.28GB    124
+e05aa05582c3   mongo2                24.31%    292.1MiB / 7.39GiB   3.86%     281MB / 263MB     2.67MB / 1.35GB   108
+344f7c85d5dc   mongo3                23.80%    277.2MiB / 7.39GiB   3.66%     244MB / 171MB     2.9MB / 1.28GB    109
+5789181111e2   proyecto2-gateway-1   103.39%   47.75MiB / 7.39GiB   0.63%     175MB / 186MB     0B / 823kB        17
+6616484295af   proyecto2-sesion-1    22.97%    38.77MiB / 7.39GiB   0.51%     91.9MB / 159MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.86%     13.19MiB / 7.39GiB   0.17%     99.5MB / 49.5MB   25.9MB / 62.6MB   7
+7672beb9f7e8   registro              18.08%    44.34MiB / 7.39GiB   0.59%     238MB / 165MB     0B / 909kB        24
+2026-11-08T00:43:38Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O          BLOCK I/O         PIDS
+ceb543315655   mongo1                26.62%    299MiB / 7.39GiB     3.95%     346MB / 581MB    1.5MB / 1.28GB    124
+e05aa05582c3   mongo2                31.68%    293MiB / 7.39GiB     3.87%     282MB / 264MB    2.67MB / 1.35GB   108
+344f7c85d5dc   mongo3                18.87%    277.5MiB / 7.39GiB   3.67%     245MB / 171MB    2.9MB / 1.28GB    109
+5789181111e2   proyecto2-gateway-1   55.44%    47.82MiB / 7.39GiB   0.63%     177MB / 189MB    0B / 823kB        17
+6616484295af   proyecto2-sesion-1    16.01%    38.53MiB / 7.39GiB   0.51%     92.9MB / 160MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    2.84%     13.21MiB / 7.39GiB   0.17%     100MB / 49.9MB   25.9MB / 63MB     7
+7672beb9f7e8   registro              15.22%    44.89MiB / 7.39GiB   0.59%     241MB / 167MB    0B / 909kB        31
+2026-11-08T00:43:45Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O          BLOCK I/O         PIDS
+ceb543315655   mongo1                53.57%    299.6MiB / 7.39GiB   3.96%     347MB / 584MB    1.5MB / 1.28GB    124
+e05aa05582c3   mongo2                60.62%    293.7MiB / 7.39GiB   3.88%     283MB / 265MB    2.67MB / 1.35GB   106
+344f7c85d5dc   mongo3                28.04%    277.7MiB / 7.39GiB   3.67%     246MB / 172MB    2.9MB / 1.28GB    108
+5789181111e2   proyecto2-gateway-1   110.49%   48.11MiB / 7.39GiB   0.64%     179MB / 191MB    0B / 823kB        17
+6616484295af   proyecto2-sesion-1    8.76%     38.55MiB / 7.39GiB   0.51%     93.9MB / 162MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    6.62%     13.26MiB / 7.39GiB   0.18%     102MB / 50.4MB   25.9MB / 63.2MB   7
+7672beb9f7e8   registro              64.74%    44.56MiB / 7.39GiB   0.59%     244MB / 169MB    0B / 909kB        28
+2026-11-08T00:43:53Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O          BLOCK I/O         PIDS
+ceb543315655   mongo1                38.05%    298.9MiB / 7.39GiB   3.95%     350MB / 589MB    1.5MB / 1.28GB    124
+e05aa05582c3   mongo2                23.24%    293.9MiB / 7.39GiB   3.88%     284MB / 265MB    2.67MB / 1.35GB   106
+344f7c85d5dc   mongo3                110.66%   277.5MiB / 7.39GiB   3.67%     247MB / 172MB    2.9MB / 1.28GB    108
+5789181111e2   proyecto2-gateway-1   109.96%   48.49MiB / 7.39GiB   0.64%     181MB / 193MB    0B / 823kB        17
+6616484295af   proyecto2-sesion-1    28.83%    38.81MiB / 7.39GiB   0.51%     95.2MB / 164MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.67%     13.31MiB / 7.39GiB   0.18%     103MB / 51MB     26MB / 63.6MB     7
+7672beb9f7e8   registro              34.25%    44.41MiB / 7.39GiB   0.59%     246MB / 170MB    0B / 909kB        24
+2026-11-08T00:44:00Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O          BLOCK I/O         PIDS
+ceb543315655   mongo1                41.17%    298.8MiB / 7.39GiB   3.95%     352MB / 593MB    1.5MB / 1.29GB    124
+e05aa05582c3   mongo2                27.77%    294.5MiB / 7.39GiB   3.89%     285MB / 266MB    2.67MB / 1.35GB   106
+344f7c85d5dc   mongo3                24.67%    277.9MiB / 7.39GiB   3.67%     248MB / 173MB    2.9MB / 1.29GB    108
+5789181111e2   proyecto2-gateway-1   104.69%   48.25MiB / 7.39GiB   0.64%     183MB / 195MB    0B / 823kB        17
+6616484295af   proyecto2-sesion-1    21.27%    38.79MiB / 7.39GiB   0.51%     96.1MB / 166MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.53%     13.37MiB / 7.39GiB   0.18%     104MB / 51.4MB   26MB / 64MB       7
+7672beb9f7e8   registro              26.31%    44.39MiB / 7.39GiB   0.59%     249MB / 172MB    0B / 909kB        25
+2026-11-08T00:44:07Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O          BLOCK I/O         PIDS
+ceb543315655   mongo1                52.57%    299.1MiB / 7.39GiB   3.95%     354MB / 598MB    1.5MB / 1.29GB    124
+e05aa05582c3   mongo2                122.41%   296.4MiB / 7.39GiB   3.92%     287MB / 266MB    2.67MB / 1.36GB   107
+344f7c85d5dc   mongo3                23.11%    279.6MiB / 7.39GiB   3.69%     249MB / 174MB    2.9MB / 1.29GB    108
+5789181111e2   proyecto2-gateway-1   71.90%    48.27MiB / 7.39GiB   0.64%     185MB / 198MB    0B / 823kB        17
+6616484295af   proyecto2-sesion-1    18.40%    38.54MiB / 7.39GiB   0.51%     97.1MB / 167MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.21%     13.41MiB / 7.39GiB   0.18%     105MB / 51.9MB   26MB / 64.3MB     7
+7672beb9f7e8   registro              22.74%    44.41MiB / 7.39GiB   0.59%     252MB / 174MB    0B / 909kB        26
+2026-11-08T00:44:14Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O          BLOCK I/O         PIDS
+ceb543315655   mongo1                57.78%    300.3MiB / 7.39GiB   3.97%     356MB / 602MB    1.5MB / 1.29GB    124
+e05aa05582c3   mongo2                33.33%    296MiB / 7.39GiB     3.91%     288MB / 267MB    2.67MB / 1.36GB   107
+344f7c85d5dc   mongo3                140.53%   446.9MiB / 7.39GiB   5.91%     250MB / 174MB    2.9MB / 1.29GB    124
+5789181111e2   proyecto2-gateway-1   109.34%   48.26MiB / 7.39GiB   0.64%     187MB / 200MB    0B / 823kB        17
+6616484295af   proyecto2-sesion-1    10.50%    38.54MiB / 7.39GiB   0.51%     98.1MB / 169MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    1.46%     13.43MiB / 7.39GiB   0.18%     106MB / 52.4MB   26.1MB / 64.5MB   7
+7672beb9f7e8   registro              59.19%    44.46MiB / 7.39GiB   0.59%     254MB / 176MB    0B / 909kB        26
+2026-11-08T00:44:21Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O          BLOCK I/O         PIDS
+ceb543315655   mongo1                35.71%    300.5MiB / 7.39GiB   3.97%     357MB / 605MB    1.5MB / 1.29GB    124
+e05aa05582c3   mongo2                25.74%    296.2MiB / 7.39GiB   3.91%     289MB / 267MB    2.67MB / 1.36GB   107
+344f7c85d5dc   mongo3                26.62%    280MiB / 7.39GiB     3.70%     251MB / 175MB    2.9MB / 1.29GB    106
+5789181111e2   proyecto2-gateway-1   109.32%   48.62MiB / 7.39GiB   0.64%     189MB / 202MB    0B / 823kB        17
+6616484295af   proyecto2-sesion-1    26.90%    38.58MiB / 7.39GiB   0.51%     99.2MB / 171MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.68%     13.46MiB / 7.39GiB   0.18%     107MB / 52.9MB   26.1MB / 64.9MB   7
+7672beb9f7e8   registro              20.45%    44.24MiB / 7.39GiB   0.58%     256MB / 177MB    0B / 909kB        22
+2026-11-08T00:44:28Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O          BLOCK I/O         PIDS
+ceb543315655   mongo1                34.02%    305.6MiB / 7.39GiB   4.04%     359MB / 610MB    1.5MB / 1.31GB    124
+e05aa05582c3   mongo2                48.19%    299.3MiB / 7.39GiB   3.96%     290MB / 268MB    2.67MB / 1.38GB   107
+344f7c85d5dc   mongo3                48.38%    283.3MiB / 7.39GiB   3.74%     252MB / 175MB    2.9MB / 1.31GB    106
+5789181111e2   proyecto2-gateway-1   102.17%   48.11MiB / 7.39GiB   0.64%     191MB / 204MB    0B / 823kB        17
+6616484295af   proyecto2-sesion-1    23.12%    38.8MiB / 7.39GiB    0.51%     99.9MB / 172MB   0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    4.23%     13.51MiB / 7.39GiB   0.18%     108MB / 53.4MB   26.1MB / 67.4MB   7
+7672beb9f7e8   registro              17.98%    44.43MiB / 7.39GiB   0.59%     260MB / 180MB    0B / 909kB        27
+2026-11-08T00:44:35Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O          BLOCK I/O         PIDS
+ceb543315655   mongo1                43.16%    306.7MiB / 7.39GiB   4.05%     362MB / 615MB    1.5MB / 1.31GB    123
+e05aa05582c3   mongo2                27.24%    299.6MiB / 7.39GiB   3.96%     291MB / 269MB    2.67MB / 1.38GB   107
+344f7c85d5dc   mongo3                53.85%    394.9MiB / 7.39GiB   5.22%     254MB / 176MB    2.9MB / 1.31GB    112
+5789181111e2   proyecto2-gateway-1   103.71%   48.44MiB / 7.39GiB   0.64%     193MB / 207MB    0B / 823kB        17
+6616484295af   proyecto2-sesion-1    13.57%    38.56MiB / 7.39GiB   0.51%     101MB / 174MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    3.68%     13.54MiB / 7.39GiB   0.18%     109MB / 53.8MB   26.1MB / 67.8MB   7
+7672beb9f7e8   registro              33.24%    44.54MiB / 7.39GiB   0.59%     263MB / 182MB    0B / 909kB        29
+2026-11-08T00:44:42Z
+CONTAINER ID   NAME                  CPU %     MEM USAGE / LIMIT    MEM %     NET I/O          BLOCK I/O         PIDS
+ceb543315655   mongo1                101.98%   307.1MiB / 7.39GiB   4.06%     363MB / 618MB    1.5MB / 1.31GB    123
+e05aa05582c3   mongo2                31.63%    299.1MiB / 7.39GiB   3.95%     292MB / 269MB    2.67MB / 1.38GB   107
+344f7c85d5dc   mongo3                32.16%    279MiB / 7.39GiB     3.69%     255MB / 177MB    2.9MB / 1.32GB    107
+5789181111e2   proyecto2-gateway-1   106.17%   48.32MiB / 7.39GiB   0.64%     195MB / 208MB    0B / 823kB        17
+6616484295af   proyecto2-sesion-1    14.88%    38.55MiB / 7.39GiB   0.51%     102MB / 176MB    0B / 823kB        17
+579e0554efb3   proyecto2-valkey-1    6.93%     13.55MiB / 7.39GiB   0.18%     110MB / 54.4MB   26.2MB / 68MB     7
+7672beb9f7e8   registro              41.09%    44.87MiB / 7.39GiB   0.59%     264MB / 183MB    0B / 909kB        29

@@ -1,0 +1,68 @@
+{
+  "gateway": "http://localhost:8000",
+  "modalidad": "texto",
+  "semilla": 2026,
+  "usuarios": 2,
+  "calentamiento_seg": 2,
+  "duracion_seg": 12,
+  "corridas": [
+    {
+      "inicio_utc": "2026-11-07T23:48:21.743855+00:00",
+      "envios_confirmados": 6,
+      "envios_por_minuto": 30.0,
+      "errores": 0,
+      "endpoints": {
+        "GET /proyectos/{proyecto_id}/exportar?limite=10": {
+          "muestras": 6,
+          "codigos": {
+            "200": 6
+          },
+          "errores": 0,
+          "p50_ms": 14.287,
+          "p95_ms": 27.946,
+          "p99_ms": 27.946
+        },
+        "POST /tareas/siguiente": {
+          "muestras": 6,
+          "codigos": {
+            "200": 6
+          },
+          "errores": 0,
+          "p50_ms": 33.25,
+          "p95_ms": 41.039,
+          "p99_ms": 41.039
+        },
+        "POST /tareas/{tarea_id}/enviar": {
+          "muestras": 6,
+          "codigos": {
+            "200": 6
+          },
+          "errores": 0,
+          "p50_ms": 41.248,
+          "p95_ms": 59.061,
+          "p99_ms": 59.061
+        },
+        "POST /tareas/{tarea_id}/revision": {
+          "muestras": 12,
+          "codigos": {
+            "200": 12
+          },
+          "errores": 0,
+          "p50_ms": 21.326,
+          "p95_ms": 49.318,
+          "p99_ms": 49.318
+        },
+        "PUT /tareas/{tarea_id}/borrador": {
+          "muestras": 12,
+          "codigos": {
+            "200": 12
+          },
+          "errores": 0,
+          "p50_ms": 38.416,
+          "p95_ms": 254.298,
+          "p99_ms": 254.298
+        }
+      }
+    }
+  ]
+}
