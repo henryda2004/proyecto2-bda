@@ -75,6 +75,159 @@ python proyecto2/pruebas/p8_fallas_mongo.py
 
 `p2_indices.py` necesita el dataset cargado. Las pruebas de salud y de fallas detienen nodos de MongoDB y los restauran al terminar. `p8_fallas_mongo.py` tarda unos 5 minutos. Si alguna se interrumpe a mitad, hay que correr `setup.sh` otra vez.
 
+
+---
+## Gateway, sesión y simulador
+
+Los comandos de esta sección se ejecutan usando WSL con Docker Compose, Python 3 y `curl`.
+
+### Arranque
+
+En un entorno nuevo, inicializar el registro y cargar el dataset.
+
+```bash
+bash scripts/setup.sh
+python3 dataset/generar_registro.py
+bash dataset/cargar_registro.sh
+```
+
+El script de carga vacía y repuebla las colecciones del registro, con el dataset ya cargado, se pruede proceder al arranque de los servicios.
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.dev.yml \
+  -f docker-compose.gateway.yml up -d --build valkey sesion gateway
+```
+
+Cuando arranque el gateway, consultar `/salud` y verificar que las capas `registro` y `sesion` figuren operativas.
+
+```bash
+curl -fsS http://127.0.0.1:8000/salud
+```
+
+El servicio de sesión usa Valkey en la red `backend`. El volumen `valkey_data` conserva los datos de Valkey con AOF y `appendfsync everysec`. El [contrato de sesión](endpoints/sesion.md) describe las rutas de asignación, guardado, recuperación y liberación.
+
+### Preparar una tarea de prueba para P3 y P8
+
+Con los servicios operativos y el dataset cargado, crear por el gateway un proyecto de texto con una tarea disponible. El bloque usa un cliente y dos anotadores registrados del catálogo.
+
+```bash
+python3 - <<'PY'
+from dataset.catalogo import generar_catalogo
+from pruebas.sesion_basica import llamar
+
+catalogo = generar_catalogo()
+anotador_a, anotador_b = [
+    a["_id"] for a in catalogo["anotadores"] if not a["es_revisor"]
+][:2]
+
+proyecto = llamar("POST", "/proyectos", {
+    "cliente_id": catalogo["clientes"][0]["_id"],
+    "nombre": "Pruebas de sesión P3 y P8",
+    "modalidad": "texto",
+    "taxonomia": [{"nombre": "persona", "instruccion": "Marcar los nombres de personas"}],
+}, 201)
+proyecto_id = proyecto["id"]
+
+llamar("POST", f"/proyectos/{proyecto_id}/lotes", {
+    "nombre": "Lote de prueba de sesión",
+    "tareas": [{
+        "uri": "s3://pruebas-gateway/texto-01.txt",
+        "sha256": "2206ed2a8d55975a13ef63e473db1c8b7649d251992390561a521bb9d41c125e",
+        "bytes": 21,
+        "mime": "text/plain",
+        "meta": {"idioma": "es"},
+        "tipo_tarea": "span",
+    }],
+}, 201)
+
+print(f"PROYECTO_ID={proyecto_id}")
+print(f"ANOTADOR_A={anotador_a}")
+print(f"ANOTADOR_B={anotador_b}")
+PY
+```
+
+Si el gateway devuelve `404` con `El anotador no existe`, comprobar que los anotadores del catálogo estén cargados en MongoDB.
+
+### P8 de Valkey y P3 de sesión
+
+Ejecutar las pruebas en orden. P8 interrumpe el cliente, reinicia Valkey y verifica el mismo borrador. P3 espera el vencimiento del candado, comprueba la reasignación de la misma tarea y verifica los códigos `409` con el token anterior y `200` con el nuevo.
+
+
+```bash
+(
+set -euo pipefail
+mkdir -p evidence
+
+python3 -u pruebas/p8_fallas_valkey.py "$PROYECTO_ID" "$ANOTADOR_A" \
+  2>&1 | tee "evidence/p8-fallas-valkey-$(date -u +%Y%m%dT%H%M%SZ).txt"
+
+python3 -u pruebas/p3_vencimiento_candado.py "$PROYECTO_ID" "$ANOTADOR_A" "$ANOTADOR_B" \
+  2>&1 | tee "evidence/p3-vencimiento-candado-$(date -u +%Y%m%dT%H%M%SZ).txt"
+)
+```
+
+Los mensajes finales esperados son `P8 Valkey OK` y `P3 OK`. Ambas pruebas liberan la tarea al finalizar.
+
+### P6 de carga
+
+Correr el simulador con el dataset cargado. Repetir el bloque para `10`, `40` y `100` usuarios, cambiando `usuarios` y dejando terminar cada nivel antes de iniciar el siguiente. Cada nivel ejecuta tres corridas con 30 segundos de calentamiento y 90 segundos de medición por corrida.
+
+```bash
+(
+set -euo pipefail
+usuarios=10
+mkdir -p evidence
+compose=(docker compose -f docker-compose.yml -f docker-compose.dev.yml
+         -f docker-compose.gateway.yml)
+ids=$("${compose[@]}" ps -q)
+if [[ -z "$ids" ]]; then
+  echo "Inicie los servicios de proyecto2 antes de medir la carga." >&2
+  exit 1
+fi
+mapfile -t contenedores <<< "$ids"
+
+salida="evidence/p6-$usuarios-$(date -u +%Y%m%dT%H%M%SZ)"
+stats="$salida-docker-stats.txt"
+docker info --format 'Docker={{.ServerVersion}} CPU_logicas={{.NCPU}} RAM_bytes={{.MemTotal}}' \
+  > "$stats"
+
+python3 -m simulador.carga --usuarios "$usuarios" \
+  --calentamiento 30 --duracion 90 --corridas 3 > "$salida.json" &
+pid=$!
+trap 'kill "$pid" 2>/dev/null || true; wait "$pid" 2>/dev/null || true' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+while kill -0 "$pid" 2>/dev/null; do
+  {
+    date -u '+%Y-%m-%dT%H:%M:%SZ'
+    docker stats --no-stream "${contenedores[@]}"
+  } >> "$stats"
+  sleep 5
+done
+
+wait "$pid"
+trap - EXIT INT TERM
+python3 -m json.tool "$salida.json" >/dev/null
+printf 'Archivos guardados\n%s\n%s\n' "$salida.json" "$stats"
+)
+```
+
+El JSON contiene los envíos confirmados, la tasa por minuto, los errores y los percentiles `p50`, `p95` y `p99` por endpoint. El TXT conserva las muestras de CPU y memoria por contenedor. Las corridas consumen tareas del dataset, por lo que una recarga entre niveles se debe registrar en el informe.
+
+### Evidencias de gateway y sesión
+
+| Prueba | Evidencia |
+| --- | --- |
+| Salud del gateway | [Respuesta de /salud](evidence/gateway-salud-con-sesion.txt) |
+| P3 · Vencimiento del candado | [Reasignación y validación de tokens](evidence/p3-vencimiento-candado-20261108T023448Z.txt) |
+| P6 · 10 usuarios | [JSON](evidence/p6-10-20261107T235400Z.json) · [Docker stats](evidence/p6-10-20261107T235400Z-docker-stats.txt) |
+| P6 · 40 usuarios | [JSON](evidence/p6-40-20261108T001656Z.json) · [Docker stats](evidence/p6-40-20261108T001656Z-docker-stats.txt) |
+| P6 · 100 usuarios | [JSON](evidence/p6-100-20261108T003819Z.json) · [Docker stats](evidence/p6-100-20261108T003819Z-docker-stats.txt) |
+| P8 · Reinicio de Valkey | [Recuperación del borrador](evidence/p8-fallas-valkey-20261108T022433Z.txt) |
+
+
+
 ---
 
 ## Para apagar todo
