@@ -10,7 +10,9 @@ from db import obtener_pendientes, marcar_procesados
 
 
 DATA_LAKE = os.getenv("DATA_LAKE", "/datalake/eventos")
-BATCH_SIZE = int(os.getenv("BATCH_SIZE", "1000"))
+
+# Cantidad máxima de eventos que se extraen de SQLite por flush.
+FLUSH_BATCH_SIZE = int(os.getenv("FLUSH_BATCH_SIZE", "10000"))
 
 
 SCHEMA = pa.schema([
@@ -98,7 +100,7 @@ def escribir_grupo(mes: str, registros: list[dict]) -> str:
     pq.write_table(
         table,
         temporal,
-        compression="snappy"
+        compression="snappy",
     )
 
     # Renombrado atómico dentro del mismo filesystem.
@@ -109,13 +111,13 @@ def escribir_grupo(mes: str, registros: list[dict]) -> str:
 
 def flush():
     """
-    Procesa los eventos pendientes de SQLite.
+    Procesa hasta FLUSH_BATCH_SIZE eventos pendientes de SQLite.
 
     Agrupa por mes, escribe Parquet y marca como procesados
     únicamente después de confirmar la existencia del archivo.
     """
 
-    pendientes = obtener_pendientes(BATCH_SIZE)
+    pendientes = obtener_pendientes(FLUSH_BATCH_SIZE)
 
     if not pendientes:
         return {
@@ -135,8 +137,7 @@ def flush():
     for mes, registros in grupos.items():
         archivo = escribir_grupo(mes, registros)
 
-        # Verificamos que el archivo exista antes de confirmar
-        # el procesamiento de los eventos en SQLite.
+        # Confirmamos el procesamiento solamente si el archivo existe.
         if os.path.isfile(archivo):
             archivos.append(archivo)
 

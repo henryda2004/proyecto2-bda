@@ -9,7 +9,8 @@ services:
     environment:
       HISTORIAL_DB: /data/historial.db
       DATA_LAKE: /datalake/eventos
-      BATCH_SIZE: "1000"
+      BATCH_SIZE: 1000
+      FLUSH_BATCH_SIZE: 10000
     volumes:
       - historial_data:/data
       - ./datalake/eventos:/datalake/eventos

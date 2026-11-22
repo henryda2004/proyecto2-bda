@@ -255,3 +255,238 @@ docker compose -f proyecto2/docker-compose.yml -f proyecto2/docker-compose.dev.y
 - Prueba de 50 solicitudes contra 10 tareas sin dobles asignaciones.
 - Pruebas de falla de MongoDB con tres escenarios, sin tareas confirmadas perdidas.
 - El registro no mantiene configuración de Valkey ni publica puertos en el compose base.
+
+## Parte 3 — Historial y Datalake
+
+### Archivos implementados
+
+| Archivo | Qué hace |
+|---|---|
+| `docker-compose.historial.yml` | Define el servicio Historial, publica el puerto `8003`, configura el volumen persistente de SQLite y monta el Datalake local. |
+| `servicios/historial/main.py` | Servicio FastAPI encargado de recibir, validar y procesar eventos históricos. |
+| `servicios/historial/db.py` | Gestiona SQLite, almacenamiento de eventos, deduplicación mediante `event_id`, pendientes y procesados. |
+| `servicios/historial/parquet.py` | Procesa los microbatches, agrupa los eventos por mes y genera archivos Parquet comprimidos con Snappy. |
+| `servicios/historial/requirements.txt` | Dependencias del servicio: FastAPI, Uvicorn, Pydantic y PyArrow. |
+| `servicios/historial/Dockerfile` | Construye la imagen del servicio Historial utilizando Python 3.12. |
+| `datalake/eventos/` | Directorio local donde se almacenan los eventos históricos particionados por mes. |
+| `evento_prueba.json` | Evento sintético utilizado para probar la recepción, validación y persistencia. |
+| `evento_prueba2.json` | Segundo evento sintético utilizado para comprobar el flush manual. |
+
+### Arquitectura de Historial
+
+El servicio Historial recibe los eventos mediante HTTP y los almacena inicialmente en SQLite. Posteriormente, los eventos pendientes se agrupan por mes y se escriben en archivos Parquet.
+
+El procesamiento utiliza microbatches de hasta 1.000 eventos, configurados mediante la variable `BATCH_SIZE`.
+
+El flujo de procesamiento es:
+
+1. Recibir el evento mediante FastAPI.
+2. Validar el evento según el contrato establecido.
+3. Insertarlo en SQLite, evitando duplicados mediante `event_id`.
+4. Mantenerlo como pendiente de procesamiento.
+5. Agrupar los eventos pendientes por mes.
+6. Generar el archivo Parquet correspondiente.
+7. Marcar los eventos como procesados en SQLite después de verificar la existencia del archivo.
+
+### Particionamiento del Datalake
+
+Los archivos Parquet se almacenan utilizando particionamiento mensual:
+
+```text
+datalake/
+└── eventos/
+    ├── mes=2026-11/
+    │   ├── batch_58c7b08ad1bb0cf0.parquet
+    │   └── batch_XXXXXXXXXXXXXXXX.parquet
+    ├── mes=2026-12/
+    │   └── batch_XXXXXXXXXXXXXXXX.parquet
+    └── ...
+```
+
+Cada archivo contiene los 16 campos definidos en el contrato de eventos. El campo `mes` se utiliza como partición del directorio y no forma parte del esquema físico de las columnas Parquet.
+
+Los archivos se escriben utilizando compresión Snappy. Para evitar exponer archivos parcialmente escritos, se utiliza un archivo temporal con extensión `.tmp`, que posteriormente se renombra al archivo definitivo mediante `os.replace()`.
+
+### Cómo levantar el servicio Historial
+
+Desde la raíz del repositorio `proyecto2`, ejecutar:
+
+```bash
+docker compose -f docker-compose.historial.yml up -d --build
+```
+
+Para verificar que el contenedor está funcionando:
+
+```bash
+docker ps
+```
+
+El contenedor debe aparecer como `historial`.
+
+Consultar el endpoint de salud:
+
+```bash
+curl http://localhost:8003/salud
+```
+
+Respuesta esperada:
+
+```json
+{
+  "servicio": "historial",
+  "estado": "ok"
+}
+```
+
+### Endpoints implementados
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| `GET` | `/salud` | Verifica que el servicio esté disponible. |
+| `POST` | `/eventos` | Recibe y almacena un evento individual. |
+| `POST` | `/eventos/lote` | Recibe una lista de eventos y los procesa individualmente. |
+| `POST` | `/flush` | Fuerza el procesamiento de eventos pendientes y su escritura a Parquet. |
+| `GET` | `/estadisticas` | Devuelve la cantidad de eventos totales, pendientes y procesados. |
+
+### Prueba de recepción de eventos
+
+Enviar el evento sintético:
+
+```bash
+curl -X POST http://localhost:8003/eventos \
+  -H "Content-Type: application/json" \
+  -d @evento_prueba.json
+```
+
+La respuesta indica si el evento fue recibido y si se trata de un duplicado.
+
+Ejemplo de respuesta:
+
+```json
+{
+  "event_id": "9c2a4f10-8b71-4e53-a1d9-6f52a8c30101",
+  "recibido": true,
+  "duplicado": false
+}
+```
+
+Para comprobar la deduplicación, enviar nuevamente el mismo evento:
+
+```bash
+curl -X POST http://localhost:8003/eventos \
+  -H "Content-Type: application/json" \
+  -d @evento_prueba.json
+```
+
+El evento debe ser reconocido como duplicado y no debe incrementar el número de registros almacenados.
+
+### Consultar estadísticas
+
+```bash
+curl http://localhost:8003/estadisticas
+```
+
+La respuesta permite verificar:
+
+- Total de eventos recibidos.
+- Cantidad de eventos pendientes.
+- Cantidad de eventos procesados.
+
+### Flush manual
+
+Para procesar los eventos pendientes y forzar su escritura a Parquet:
+
+```bash
+curl -X POST http://localhost:8003/flush
+```
+
+El servicio devuelve el número de eventos procesados y las rutas de los archivos Parquet generados.
+
+Después del flush, volver a consultar las estadísticas:
+
+```bash
+curl http://localhost:8003/estadisticas
+```
+
+Los eventos escritos correctamente deben aparecer como procesados y dejar de contabilizarse como pendientes.
+
+### Flush automático
+
+El servicio también ejecuta un flush al iniciar.
+
+Esto permite intentar recuperar eventos que hayan quedado pendientes en SQLite de una ejecución anterior, por ejemplo, si el contenedor se reinició antes de completar la escritura al Datalake.
+
+Además, cuando el número de eventos pendientes alcanza el valor configurado en `BATCH_SIZE`, el servicio intenta realizar un flush automático.
+
+### Verificar los archivos Parquet generados
+
+Desde la raíz del repositorio:
+
+```bash
+find datalake/eventos -type f
+```
+
+Para consultar el esquema físico de uno de los archivos Parquet:
+
+```bash
+docker exec historial python -c "
+import glob
+import pyarrow.parquet as pq
+
+f = glob.glob('/datalake/eventos/mes=*/batch_*.parquet')[0]
+p = pq.ParquetFile(f)
+
+print('Archivo:', f)
+print('Esquema:')
+print(p.schema)
+print('Cantidad de filas:', p.metadata.num_rows)
+"
+```
+
+Para leer el contenido de un archivo Parquet:
+
+```bash
+docker exec historial python -c "
+import glob
+import pyarrow.parquet as pq
+
+f = glob.glob('/datalake/eventos/mes=*/batch_*.parquet')[0]
+table = pq.read_table(f)
+
+print(table.schema)
+print(table.to_pandas())
+"
+```
+
+Para verificar el particionamiento mensual:
+
+```bash
+find datalake/eventos -maxdepth 1 -type d
+```
+
+### Persistencia
+
+El servicio utiliza dos mecanismos de persistencia:
+
+- **SQLite:** almacena los eventos recibidos y su estado de procesamiento en el volumen Docker `historial_data`.
+- **Datalake:** almacena los archivos Parquet en `datalake/eventos/`, montado directamente desde el repositorio.
+
+El volumen de SQLite permite conservar el registro de eventos pendientes y procesados aunque el contenedor sea recreado. El Datalake permanece en el directorio local del repositorio.
+
+### Estado actual — Historial
+
+- Servicio FastAPI implementado y operativo.
+- Contenedor Docker construido y ejecutándose correctamente.
+- Endpoint de salud verificado.
+- Recepción de eventos individuales validada.
+- Deduplicación por `event_id` comprobada.
+- Persistencia inicial en SQLite verificada.
+- Escritura de archivos Parquet comprobada.
+- Esquema físico de Parquet verificado con los 16 campos del contrato.
+- Particionamiento mensual `mes=YYYY-MM` comprobado.
+- Flush automático al iniciar verificado.
+- Flush manual probado exitosamente.
+- Dos eventos procesados correctamente, con cero eventos pendientes.
+- Dataset sintético de historial a gran escala pendiente de implementación.
+- Integración con el Gateway pendiente.
+- Consultas analíticas con Spark pendientes.

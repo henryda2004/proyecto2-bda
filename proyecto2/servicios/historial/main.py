@@ -12,6 +12,7 @@ import parquet
 
 
 BATCH_SIZE = int(os.getenv("BATCH_SIZE", "1000"))
+FLUSH_BATCH_SIZE = int(os.getenv("FLUSH_BATCH_SIZE", "10000"))
 
 app = FastAPI(
     title="Servicio Historial",
@@ -117,7 +118,7 @@ def procesar_evento(evento: Evento):
     # Si llegamos al umbral de microbatch, escribimos.
     estadisticas = db.contar_eventos()
 
-    if estadisticas["pendientes"] >= BATCH_SIZE:
+    if estadisticas["pendientes"] >= FLUSH_BATCH_SIZE:
         resultado["flush"] = parquet.flush()
 
     return resultado
@@ -161,29 +162,49 @@ def recibir_lote(eventos: list[Evento]):
     if not eventos:
         raise HTTPException(
             status_code=400,
-            detail="La lista de eventos está vacía",
+            detail="La lista de eventos está vacía"
         )
 
-    resultados = []
-    errores = []
+    try:
+        # Normalizar todos los eventos recibidos
+        registros = [
+            normalizar_evento(evento)
+            for evento in eventos
+        ]
 
-    for evento in eventos:
-        try:
-            resultados.append(procesar_evento(evento))
+        # Insertar el lote en una única conexión/transacción SQLite
+        inserciones = db.insertar_eventos(registros)
 
-        except Exception as exc:
-            errores.append({
+        resultados = [
+            {
                 "event_id": evento.event_id,
-                "error": str(exc),
-            })
+                "recibido": True,
+                "duplicado": not nuevo,
+            }
+            for evento, nuevo in zip(eventos, inserciones)
+        ]
 
-    return {
-        "recibidos": len(eventos),
-        "procesados": len(resultados),
-        "errores": errores,
-        "resultados": resultados,
-    }
+        # Consultar estadísticas únicamente una vez por lote
+        estadisticas = db.contar_eventos()
 
+        resultado = {
+            "recibidos": len(eventos),
+            "procesados": len(eventos),
+            "errores": [],
+            "resultados": resultados,
+        }
+
+        # Evaluar el flush una sola vez por lote
+        if estadisticas["pendientes"] >= FLUSH_BATCH_SIZE:
+            resultado["flush"] = parquet.flush()
+
+        return resultado
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error procesando lote: {str(exc)}"
+        )
 
 @app.post("/flush")
 def forzar_flush():
