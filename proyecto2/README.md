@@ -263,34 +263,47 @@ docker compose -f proyecto2/docker-compose.yml -f proyecto2/docker-compose.dev.y
 | Archivo | Qué hace |
 |---|---|
 | `docker-compose.historial.yml` | Define el servicio Historial, publica el puerto `8003`, configura el volumen persistente de SQLite y monta el Datalake local. |
-| `servicios/historial/main.py` | Servicio FastAPI encargado de recibir, validar y procesar eventos históricos. |
-| `servicios/historial/db.py` | Gestiona SQLite, almacenamiento de eventos, deduplicación mediante `event_id`, pendientes y procesados. |
-| `servicios/historial/parquet.py` | Procesa los microbatches, agrupa los eventos por mes y genera archivos Parquet comprimidos con Snappy. |
+| `servicios/historial/main.py` | Servicio FastAPI encargado de recibir, validar, normalizar y procesar eventos históricos, tanto individualmente como en lotes. |
+| `servicios/historial/db.py` | Gestiona SQLite, almacenamiento de eventos, deduplicación mediante `event_id`, eventos pendientes y procesados, y operaciones batch de inserción. |
+| `servicios/historial/parquet.py` | Procesa los eventos pendientes mediante flush, los agrupa por mes y genera archivos Parquet comprimidos con Snappy. |
 | `servicios/historial/requirements.txt` | Dependencias del servicio: FastAPI, Uvicorn, Pydantic y PyArrow. |
 | `servicios/historial/Dockerfile` | Construye la imagen del servicio Historial utilizando Python 3.12. |
-| `datalake/eventos/` | Directorio local donde se almacenan los eventos históricos particionados por mes. |
-| `evento_prueba.json` | Evento sintético utilizado para probar la recepción, validación y persistencia. |
+| `servicios/historial/generador/generar_historial.py` | Generador de datos sintéticos que simula ciclos de vida de tareas, produce eventos históricos y los envía al servicio mediante lotes HTTP. Permite configurar el volumen de tareas, tamaño de lote, seed y ejecución en modo `dry-run`. |
+| `datalake/eventos/` | Directorio local donde se almacenan los eventos históricos en archivos Parquet, particionados por mes. |
+| `evento_prueba.json` | Evento sintético utilizado para probar la recepción, validación y persistencia de un evento individual. |
 | `evento_prueba2.json` | Segundo evento sintético utilizado para comprobar el flush manual. |
 
 ### Arquitectura de Historial
 
-El servicio Historial recibe los eventos mediante HTTP y los almacena inicialmente en SQLite. Posteriormente, los eventos pendientes se agrupan por mes y se escriben en archivos Parquet.
+El servicio Historial recibe los eventos mediante HTTP utilizando FastAPI. Los eventos son validados y normalizados antes de almacenarse inicialmente en SQLite, donde se mantienen como pendientes de procesamiento.
 
-El procesamiento utiliza microbatches de hasta 1.000 eventos, configurados mediante la variable `BATCH_SIZE`.
+La inserción utiliza operaciones batch para reducir el overhead de procesamiento y las transacciones de SQLite. Se implementa deduplicación mediante `event_id`, evitando almacenar eventos que ya hayan sido recibidos.
+
+Posteriormente, los eventos pendientes se agrupan por mes y se escriben en archivos Parquet dentro del Datalake. Una vez completada la escritura, los eventos correspondientes se marcan como procesados en SQLite.
+
+El procesamiento utiliza dos tamaños de batch independientes:
+
+| Variable | Valor | Descripción |
+|---|---:|---|
+| `BATCH_SIZE` | `1000` | Cantidad de eventos enviada en cada lote HTTP al servicio Historial. |
+| `FLUSH_BATCH_SIZE` | `10000` | Umbral de eventos pendientes que activa el flush automático hacia Parquet. |
+
+Esta separación permite recibir eventos mediante lotes HTTP relativamente pequeños, mientras se acumulan eventos en SQLite para generar archivos Parquet de mayor tamaño y reducir la cantidad de archivos producidos.
 
 El flujo de procesamiento es:
 
-1. Recibir el evento mediante FastAPI.
-2. Validar el evento según el contrato establecido.
-3. Insertarlo en SQLite, evitando duplicados mediante `event_id`.
-4. Mantenerlo como pendiente de procesamiento.
-5. Agrupar los eventos pendientes por mes.
-6. Generar el archivo Parquet correspondiente.
-7. Marcar los eventos como procesados en SQLite después de verificar la existencia del archivo.
+1. Recibir eventos mediante FastAPI.
+2. Validar y normalizar los eventos según el contrato establecido.
+3. Insertar el lote en SQLite, evitando duplicados mediante `event_id`.
+4. Mantener los eventos nuevos como pendientes de procesamiento.
+5. Cuando el número de eventos pendientes alcanza el umbral de `FLUSH_BATCH_SIZE`, ejecutar un flush automático.
+6. Agrupar los eventos pendientes por mes.
+7. Generar los archivos Parquet correspondientes.
+8. Marcar como procesados en SQLite los eventos cuya escritura al Datalake se completó correctamente.
 
 ### Particionamiento del Datalake
 
-Los archivos Parquet se almacenan utilizando particionamiento mensual:
+Los archivos Parquet se almacenan utilizando particionamiento mensual mediante el campo `mes`, siguiendo la estructura:
 
 ```text
 datalake/
@@ -306,6 +319,8 @@ datalake/
 Cada archivo contiene los 16 campos definidos en el contrato de eventos. El campo `mes` se utiliza como partición del directorio y no forma parte del esquema físico de las columnas Parquet.
 
 Los archivos se escriben utilizando compresión Snappy. Para evitar exponer archivos parcialmente escritos, se utiliza un archivo temporal con extensión `.tmp`, que posteriormente se renombra al archivo definitivo mediante `os.replace()`.
+
+El agrupamiento por mes permite organizar el historial temporalmente y facilita el procesamiento posterior mediante herramientas analíticas como Apache Spark.
 
 ### Cómo levantar el servicio Historial
 
@@ -343,8 +358,8 @@ Respuesta esperada:
 | Método | Endpoint | Descripción |
 |---|---|---|
 | `GET` | `/salud` | Verifica que el servicio esté disponible. |
-| `POST` | `/eventos` | Recibe y almacena un evento individual. |
-| `POST` | `/eventos/lote` | Recibe una lista de eventos y los procesa individualmente. |
+| `POST` | `/eventos` | Recibe, valida y almacena un evento individual. |
+| `POST` | `/eventos/lote` | Recibe una lista de eventos, los normaliza e inserta mediante procesamiento batch. |
 | `POST` | `/flush` | Fuerza el procesamiento de eventos pendientes y su escritura a Parquet. |
 | `GET` | `/estadisticas` | Devuelve la cantidad de eventos totales, pendientes y procesados. |
 
@@ -388,9 +403,11 @@ curl http://localhost:8003/estadisticas
 
 La respuesta permite verificar:
 
-- Total de eventos recibidos.
-- Cantidad de eventos pendientes.
+- Total de eventos almacenados.
+- Cantidad de eventos pendientes de procesamiento.
 - Cantidad de eventos procesados.
+
+Estas estadísticas permiten comprobar el estado de la ingestión y del procesamiento de los eventos en SQLite.
 
 ### Flush manual
 
@@ -412,11 +429,108 @@ Los eventos escritos correctamente deben aparecer como procesados y dejar de con
 
 ### Flush automático
 
-El servicio también ejecuta un flush al iniciar.
+El servicio ejecuta un flush al iniciar, permitiendo intentar recuperar eventos que hayan quedado pendientes en SQLite de una ejecución anterior. Esto permite continuar el procesamiento después de un reinicio del contenedor, siempre que existan eventos pendientes y los archivos correspondientes no hayan sido generados previamente.
 
-Esto permite intentar recuperar eventos que hayan quedado pendientes en SQLite de una ejecución anterior, por ejemplo, si el contenedor se reinició antes de completar la escritura al Datalake.
+Además, cuando la cantidad de eventos pendientes alcanza el valor configurado en `FLUSH_BATCH_SIZE` (actualmente `10000`), el servicio intenta realizar un flush automático.
 
-Además, cuando el número de eventos pendientes alcanza el valor configurado en `BATCH_SIZE`, el servicio intenta realizar un flush automático.
+El flush extrae hasta el límite configurado de eventos pendientes, los agrupa por mes, genera los archivos Parquet correspondientes y marca los eventos como procesados una vez completada la escritura.
+
+El flush final solicitado por el generador puede devolver cero eventos si los flush automáticos ya procesaron todos los eventos pendientes durante la ingestión.
+
+### Generador de historial sintético
+
+Se implementó un generador de eventos sintéticos para simular el ciclo de vida de tareas de anotación y producir un historial de actividad a gran escala.
+
+Archivo:
+
+```text
+servicios/historial/generador/generar_historial.py
+```
+
+El generador utiliza el catálogo sintético del proyecto para reutilizar entidades como clientes, proyectos, equipos, anotadores y revisores. Los IDs de las tareas y batches generados para el historial son propios del generador y no modifican el registro operativo de MongoDB.
+
+Cada tarea genera una secuencia de eventos que representa su ciclo de vida, incluyendo apertura, anotación, revisión, rechazos cuando corresponda, reasignación y aprobación final.
+
+La distribución de ciclos utilizada en las pruebas es:
+
+| Ciclo | Porcentaje | Tareas |
+|---|---:|---:|
+| 0 rechazos | 25% | 25,000 por cada 100,000 tareas |
+| 1 rechazo | 50% | 50,000 por cada 100,000 tareas |
+| 2 rechazos | 25% | 25,000 por cada 100,000 tareas |
+
+El número de eventos por tarea depende de su ciclo:
+
+| Rechazos | Eventos por tarea |
+|---|---:|
+| 0 | 4 |
+| 1 | 8 |
+| 2 | 12 |
+
+Con esta distribución se obtiene un promedio de 8 eventos por tarea, permitiendo generar 800,000 eventos a partir de 100,000 tareas.
+
+El generador permite configurar los parámetros de ejecución, por ejemplo:
+
+```bash
+python servicios/historial/generador/generar_historial.py \
+  --tareas 100000 \
+  --batch-size 1000 \
+  --seed 5126
+```
+
+También permite ejecutar una simulación sin enviar eventos al servicio utilizando `--dry-run`, así como ajustar la cantidad de tareas, tamaño de batch, URL del servicio y seed.
+
+### Prueba de carga del generador sintético
+
+Se realizó una prueba de carga utilizando 100,000 tareas sintéticas, generando un total de 800,000 eventos históricos.
+
+Resultados de la ejecución:
+
+| Métrica | Resultado |
+|---|---:|
+| Tareas generadas | 100,000 |
+| Eventos generados | 800,000 |
+| Eventos enviados | 800,000 |
+| Lotes HTTP | 800 |
+| Tamaño de batch HTTP | 1,000 |
+| Tiempo total | 364.47 segundos |
+| Tiempo aproximado | 6 min 4.47 s |
+| Throughput promedio | 2,195 eventos/s |
+
+Distribución de ciclos por cantidad de rechazos:
+
+| Rechazos | Tareas |
+|---|---:|
+| 0 | 25,000 |
+| 1 | 50,000 |
+| 2 | 25,000 |
+
+Distribución de eventos por estado:
+
+| Estado | Eventos |
+|---|---:|
+| `abierta` | 200,000 |
+| `anotada` | 200,000 |
+| `en_revision` | 200,000 |
+| `aprobada` | 100,000 |
+| `rechazada` | 100,000 |
+| **Total** | **800,000** |
+
+Distribución de eventos por modalidad:
+
+| Modalidad | Eventos |
+|---|---:|
+| `imagen` | 240,372 |
+| `lidar` | 161,200 |
+| `texto` | 238,108 |
+| `video` | 160,320 |
+| **Total** | **800,000** |
+
+Los eventos se distribuyeron temporalmente a lo largo del período sintético de 12 meses, utilizando particionamiento mensual en el Datalake.
+
+El throughput promedio de la prueba fue de aproximadamente 2,195 eventos por segundo. El tiempo de ejecución se mantuvo proporcional al aumentar el volumen de la prueba desde 80,000 hasta 800,000 eventos, sin observar una degradación significativa del throughput bajo las condiciones de ejecución utilizadas.
+
+El flush final devolvió cero eventos pendientes, debido a que los flush automáticos habían procesado los eventos acumulados durante la ingestión.
 
 ### Verificar los archivos Parquet generados
 
@@ -468,10 +582,12 @@ find datalake/eventos -maxdepth 1 -type d
 
 El servicio utiliza dos mecanismos de persistencia:
 
-- **SQLite:** almacena los eventos recibidos y su estado de procesamiento en el volumen Docker `historial_data`.
+- **SQLite:** almacena los eventos recibidos, su payload y su estado de procesamiento en el volumen Docker `historial_data`.
 - **Datalake:** almacena los archivos Parquet en `datalake/eventos/`, montado directamente desde el repositorio.
 
-El volumen de SQLite permite conservar el registro de eventos pendientes y procesados aunque el contenedor sea recreado. El Datalake permanece en el directorio local del repositorio.
+El volumen de SQLite permite conservar los registros de eventos pendientes y procesados aunque el contenedor sea recreado. El Datalake permanece en el directorio local del repositorio, separado del ciclo de vida del contenedor.
+
+SQLite mantiene el control de los eventos recibidos y su estado, mientras que Parquet constituye el almacenamiento histórico destinado al procesamiento analítico posterior.
 
 ### Estado actual — Historial
 
@@ -479,14 +595,23 @@ El volumen de SQLite permite conservar el registro de eventos pendientes y proce
 - Contenedor Docker construido y ejecutándose correctamente.
 - Endpoint de salud verificado.
 - Recepción de eventos individuales validada.
+- Recepción batch implementada y optimizada.
 - Deduplicación por `event_id` comprobada.
+- Inserción batch en SQLite implementada.
 - Persistencia inicial en SQLite verificada.
 - Escritura de archivos Parquet comprobada.
-- Esquema físico de Parquet verificado con los 16 campos del contrato.
+- Esquema físico Parquet verificado con los 16 campos del contrato.
 - Particionamiento mensual `mes=YYYY-MM` comprobado.
-- Flush automático al iniciar verificado.
+- Compresión Snappy implementada.
+- Escritura mediante archivos temporales y renombrado atómico implementada.
+- Flush automático al iniciar implementado.
+- Flush automático mediante umbral de `FLUSH_BATCH_SIZE` implementado.
 - Flush manual probado exitosamente.
-- Dos eventos procesados correctamente, con cero eventos pendientes.
-- Dataset sintético de historial a gran escala pendiente de implementación.
+- Configuración independiente de batch HTTP y tamaño de flush implementada.
+- Generador de historial sintético implementado.
+- Prueba de carga de 100,000 tareas completada.
+- 800,000 eventos generados y enviados exitosamente.
+- Rendimiento aproximado de 2,195 eventos por segundo en la prueba de carga.
 - Integración con el Gateway pendiente.
+- Validación integral de consistencia entre SQLite y el total del Datalake pendiente de confirmar.
 - Consultas analíticas con Spark pendientes.
