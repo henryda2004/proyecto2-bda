@@ -1,0 +1,18 @@
+{
+  "event_id": "9c2a4f10-8b71-4e53-a1d9-6f52a8c30101",
+  "event_ts": "2026-11-22T19:45:00Z",
+  "tarea_id": "2f1b7c40-8b71-4e53-a1d9-6f52a8c30102",
+  "version": 1,
+  "estado": "abierta",
+  "cliente_id": "cliente-prueba-001",
+  "proyecto_id": "proyecto-prueba-001",
+  "batch_id": "batch-prueba-001",
+  "anotador_id": "anotador-prueba-001",
+  "equipo_id": "equipo-prueba-001",
+  "revisor_id": null,
+  "modalidad": "imagen",
+  "tipo_tarea": "bbox",
+  "duracion_seg": null,
+  "motivo_rechazo": null,
+  "sla_horas": 48
+}
