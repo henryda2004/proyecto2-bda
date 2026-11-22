@@ -1,0 +1,13 @@
+services:
+  analitica:
+    build:
+      context: ./servicios/analitica
+    container_name: analitica
+    restart: unless-stopped
+    ports:
+      - "8004:8004"
+    environment:
+      DATA_LAKE: /datalake/eventos
+      SPARK_WORKERS: 1
+    volumes:
+      - ./datalake/eventos:/datalake/eventos:ro
