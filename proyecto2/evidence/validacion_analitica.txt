@@ -1,0 +1,65 @@
+============================================================
+VALIDACION FUNCIONAL DE ANALITICA Q1-Q5
+Proyecto 2 - Base de Datos
+============================================================
+
+Entorno:
+- Spark ejecutado localmente en WSL Ubuntu
+- PySpark actualizado
+- Java 17
+- Dataset de validacion controlada (sintetico)
+
+RESULTADO
+------------------------------------------------------------
+Q1: PASS (3/3)
+- Conteo de eventos de texto por fecha
+- Conteo de eventos de imagen por fecha
+- Exclusion de fechas fuera de la ventana
+
+Q2: PASS (6/6)
+- Eventos revisados por equipo
+- Eventos aprobados por equipo
+- Ratio de aprobacion para E-Q2-01
+- Eventos revisados por equipo para E-Q2-02
+- Eventos aprobados para E-Q2-02
+- Ratio de aprobacion para E-Q2-02
+
+Q3: PASS (6/6)
+- Cantidad de eventos texto/span
+- Duracion media texto/span
+- P95 texto/span
+- Cantidad de eventos imagen/box
+- Duracion media imagen/box
+- P95 imagen/box
+
+Q4: PASS (6/6)
+- Eventos revisados por cliente/proyecto
+- Eventos rechazados por cliente/proyecto
+- Ratio de rechazo C-Q4-01/P-Q4-01
+- Ratio C-Q4-01/P-Q4-02
+- Rechazos C-Q4-02/P-Q4-03
+- Ratio C-Q4-02/P-Q4-03
+
+Q5: PASS (7/7)
+- Cantidad de eventos para C-Q5-01
+- P50 C-Q5-01
+- P95 C-Q5-01
+- Incumplimiento SLA C-Q5-01
+- P50 C-Q5-02
+- P95 C-Q5-02
+- Incumplimiento SLA C-Q5-02
+
+============================================================
+RESULTADO FINAL
+============================================================
+
+Pruebas exitosas: 28
+Pruebas fallidas: 0
+
+VALIDACION COMPLETADA: TODAS LAS PRUEBAS PASS
+
+Las cinco consultas analiticas Q1-Q5 superaron las
+validaciones de resultados esperados con el dataset de
+prueba controlada.
+
+============================================================

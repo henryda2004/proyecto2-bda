@@ -1,0 +1,113 @@
+============================================================
+BENCHMARK DE ANALITICA SPARK
+Comparacion local[1] vs local[2]
+Proyecto 2 - Base de Datos
+============================================================
+
+ENTORNO
+------------------------------------------------------------
+Sistema: Ubuntu WSL2
+Java: OpenJDK 17
+Motor: Apache Spark / PySpark
+Dataset: Datalake Parquet real
+Eventos unicos procesados: 976087
+Repeticiones posteriores por consulta: 5
+Configuraciones comparadas:
+  - local[1] (1 worker)
+  - local[2] (2 workers)
+
+DATALAKE
+------------------------------------------------------------
+Ruta:
+datalake/eventos
+
+RESULTADOS: PREPARACION DEL DATASET
+------------------------------------------------------------
+Workers 1:
+  Tiempo: 227.3536 s
+
+Workers 2:
+  Tiempo: 134.7437 s
+
+Reduccion de tiempo con 2 workers: 40.7%
+
+RESULTADOS: CONSULTAS ANALITICAS (PROMEDIO WARM)
+------------------------------------------------------------
+Consulta   1 Worker   2 Workers   Speedup
+Q1        1.3606 s    1.3322 s    1.02x
+Q2        2.6840 s    2.0452 s    1.31x
+Q3        1.3129 s    0.8164 s    1.61x
+Q4        2.4142 s    1.5799 s    1.53x
+Q5        6.6071 s    1.9414 s    3.40x
+
+REDUCCION POR CONSULTA
+------------------------------------------------------------
+Q1:  2.1%
+Q2: 23.8%
+Q3: 37.8%
+Q4: 34.6%
+Q5: 70.6%
+
+TIEMPO ACUMULADO DE CONSULTAS WARM
+------------------------------------------------------------
+1 worker:
+  15.379 s
+
+2 workers:
+  7.715 s
+
+Reduccion acumulada:
+  49.8%
+
+Speedup acumulado:
+  1.99x
+
+PREPARACION + CONSULTAS WARM
+------------------------------------------------------------
+1 worker:
+  Preparacion: 227.3536 s
+  Consultas:   15.3790 s
+  Total:       242.7326 s
+
+2 workers:
+  Preparacion: 134.7437 s
+  Consultas:    7.7150 s
+  Total:       142.4587 s
+
+Mejora total estimada:
+  41.3%
+
+Tiempo ahorrado:
+  100.27 s
+
+============================================================
+CONCLUSION
+============================================================
+
+El uso de dos workers (local[2]) mejora el rendimiento
+de la preparacion del dataset y de las consultas analiticas.
+
+La mejora es variable dependiendo de la consulta:
+- Q1 presenta una mejora marginal.
+- Q2 presenta una mejora moderada.
+- Q3 y Q4 presentan mejoras significativas.
+- Q5 presenta la mayor mejora, con un speedup de 3.40x.
+
+La suma de los tiempos promedio de las cinco consultas
+warm se reduce aproximadamente un 49.8%.
+
+La preparacion del dataset se reduce aproximadamente
+un 40.7%.
+
+Considerando preparacion y consultas warm, el proceso
+medido se reduce aproximadamente un 41.3%.
+
+Estos resultados respaldan el uso de local[2] como
+configuracion de referencia para los experimentos de
+rendimiento actuales.
+
+Las mediciones corresponden a este entorno experimental
+y no constituyen una garantia de rendimiento constante
+en otros equipos o configuraciones.
+
+============================================================

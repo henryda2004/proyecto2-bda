@@ -11,3 +11,4 @@ services:
       SPARK_WORKERS: 1
     volumes:
       - ./datalake/eventos:/datalake/eventos:ro
+      - ./pruebas:/app/pruebas:ro

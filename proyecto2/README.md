@@ -614,4 +614,646 @@ SQLite mantiene el control de los eventos recibidos y su estado, mientras que Pa
 - Rendimiento aproximado de 2,195 eventos por segundo en la prueba de carga.
 - Integración con el Gateway pendiente.
 - Validación integral de consistencia entre SQLite y el total del Datalake pendiente de confirmar.
-- Consultas analíticas con Spark pendientes.
+- Servicio de Analítica con Apache Spark implementado y operativo.
+- Integración de Spark con el Datalake Parquet de Historial completada.
+- Dataset histórico leído desde el Datalake y deduplicado mediante `event_id`.
+- Dataset de eventos materializado y persistido en caché de Spark (`MEMORY_AND_DISK`).
+- Inicialización del dataset durante el arranque del servicio de Analítica.
+- Endpoint de estadísticas de Analítica implementado y verificado.
+- Consultas analíticas Q1–Q5 implementadas y ejecutadas exitosamente.
+- Optimización de consultas mediante reutilización del dataset persistido.
+- Rendimiento de las consultas Q1–Q5 medido y verificado.
+
+## Parte 4 — Analítica con Apache Spark
+
+### Objetivo
+
+Se implementó un servicio de analítica utilizando Apache Spark para procesar los eventos históricos almacenados en el Datalake de Parquet generado por el servicio Historial.
+
+El servicio permite ejecutar consultas analíticas sobre el historial de las tareas, aprovechando el procesamiento distribuido de datos de Spark y su capacidad para realizar operaciones de filtrado, agrupamiento, agregación, joins y cálculo de métricas estadísticas.
+
+El objetivo es separar la ingestión y persistencia de eventos del procesamiento analítico, permitiendo que el servicio Historial se encargue de almacenar los eventos, mientras que Analítica se encarga de procesarlos para obtener indicadores y estadísticas.
+
+---
+
+### Archivos implementados
+
+| Archivo | Qué hace |
+|---|---|
+| `docker-compose.analitica.yml` | Define el servicio Analítica, publica el puerto `8004` y monta el Datalake de eventos como volumen de solo lectura. |
+| `servicios/analitica/main.py` | Servicio FastAPI que expone los endpoints de estadísticas y consultas analíticas Q1–Q5. |
+| `servicios/analitica/consultas.py` | Contiene la configuración de Spark, lectura del Datalake, preparación del dataset y las implementaciones de Q1–Q5. |
+| `servicios/analitica/requirements.txt` | Dependencias del servicio: FastAPI, Uvicorn y PySpark. |
+| `servicios/analitica/Dockerfile` | Construye la imagen del servicio Analítica, incluyendo Python y Java 17, necesarios para ejecutar Spark. |
+| `pruebas/analitica_controlada.py` | Script utilizado para validar la implementación de Q1–Q5 y realizar pruebas de rendimiento controladas. |
+| `evidence/validacion_analitica.txt` | Evidencia de validación funcional de las cinco consultas analíticas. |
+| `evidence/benchmark_analitica.txt` | Resultados de las pruebas de rendimiento y comparación de configuración de workers. |
+| `evidence/resumen_analitica.txt` | Resumen de los principales resultados experimentales obtenidos. |
+
+---
+
+### Arquitectura del servicio Analítica
+
+El servicio Analítica utiliza FastAPI como interfaz HTTP y Apache Spark como motor de procesamiento de datos.
+
+El Datalake generado por Historial se monta dentro del contenedor de Analítica en la ruta:
+
+```text
+/datalake/eventos
+```
+
+El servicio utiliza PySpark para leer los archivos Parquet y preparar un DataFrame con los eventos históricos que serán utilizados por las consultas analíticas.
+
+La arquitectura implementada permite mantener separados los servicios de ingestión y analítica:
+
+- **Historial:** recibe, valida y persiste los eventos.
+- **Datalake:** almacena los eventos históricos en archivos Parquet particionados por mes.
+- **Analítica:** lee el Datalake y ejecuta las consultas sobre el historial almacenado.
+
+El volumen del Datalake se monta en Analítica en modo de solo lectura (`ro`), evitando que las consultas analíticas modifiquen directamente los archivos históricos.
+
+---
+
+### Configuración de Apache Spark
+
+Spark se configura para ejecutarse en modo local dentro del contenedor de Analítica.
+
+La configuración utilizada incluye:
+
+| Parámetro | Valor | Descripción |
+|---|---|---|
+| `master` | `local[1]` | Ejecuta Spark utilizando un worker local. |
+| `SPARK_WORKERS` | `1` | Define la cantidad de threads de ejecución local utilizados por Spark. |
+| `spark.sql.shuffle.partitions` | `1` | Configura la cantidad de particiones para operaciones de shuffle. |
+| `spark.sql.adaptive.enabled` | `true` | Habilita Adaptive Query Execution. |
+| `spark.sql.parquet.filterPushdown` | `true` | Permite optimizar el filtrado de datos durante la lectura de Parquet. |
+
+La configuración permite ejecutar las consultas analíticas dentro del contenedor sin necesidad de desplegar un clúster Spark externo.
+
+---
+
+### Lectura y preparación del dataset
+
+Durante la inicialización del servicio, Spark lee los archivos Parquet almacenados en el Datalake:
+
+```text
+/datalake/eventos
+```
+
+El DataFrame resultante se prepara mediante los siguientes pasos:
+
+1. Leer los archivos Parquet del Datalake.
+2. Aplicar la deduplicación mediante `event_id`.
+3. Persistir el DataFrame utilizando `MEMORY_AND_DISK`.
+4. Materializar el dataset mediante una operación `count()`.
+5. Reutilizar el dataset persistido para las consultas analíticas Q1–Q5.
+
+La deduplicación se realiza utilizando el identificador único del evento:
+
+```python
+df = df.dropDuplicates(["event_id"])
+```
+
+Posteriormente, el dataset se persiste:
+
+```python
+df = df.persist(StorageLevel.MEMORY_AND_DISK)
+```
+
+La materialización mediante `count()` permite ejecutar el procesamiento inicial y cargar el dataset en la caché antes de que las consultas analíticas sean ejecutadas.
+
+Esto evita que cada consulta tenga que volver a leer todos los archivos Parquet y realizar nuevamente la deduplicación del historial.
+
+---
+
+### Optimización mediante caché
+
+Inicialmente, las consultas analíticas necesitaban procesar el Datalake completo al ejecutarse, lo que generaba tiempos de respuesta elevados.
+
+Se implementó la persistencia del DataFrame de eventos mediante Spark utilizando:
+
+```python
+StorageLevel.MEMORY_AND_DISK
+```
+
+El dataset se prepara durante el arranque del servicio y permanece persistido para ser reutilizado por las consultas.
+
+La estrategia utilizada permite:
+
+- Evitar múltiples lecturas del Datalake para cada consulta.
+- Evitar repetir la deduplicación de eventos en cada ejecución.
+- Reutilizar el DataFrame preparado por Spark.
+- Reducir los tiempos de ejecución de Q1–Q5.
+- Mantener la posibilidad de utilizar almacenamiento en disco si el dataset no cabe completamente en memoria.
+
+La preparación inicial del dataset se realiza durante el startup de FastAPI, de manera que el servicio se inicializa con los datos históricos listos para ser utilizados por las consultas.
+
+---
+
+### Consultas analíticas implementadas
+
+Se implementaron cinco consultas analíticas utilizando PySpark.
+
+#### Q1 — Aprobaciones por fecha y modalidad
+
+Analiza las tareas aprobadas durante los últimos 90 días con respecto al timestamp más reciente del dataset.
+
+Los resultados se agrupan por fecha y modalidad, permitiendo observar la cantidad de tareas aprobadas en cada período.
+
+La consulta utiliza eventos con estado `aprobada` y contabiliza las tareas mediante `task_id` único.
+
+#### Q2 — Tasa de aprobación por equipo y mes
+
+Analiza el desempeño de los equipos agrupando las tareas revisadas y aprobadas por equipo y mes.
+
+La consulta relaciona las tareas que entraron en revisión con aquellas que posteriormente fueron aprobadas, permitiendo calcular la tasa de aprobación por equipo y período mensual.
+
+#### Q3 — Duración de anotación por modalidad y tipo de tarea
+
+Analiza la duración de las tareas desde su apertura hasta el momento en que fueron anotadas.
+
+Los resultados se agrupan por modalidad y tipo de tarea e incluyen:
+
+- Cantidad de tareas.
+- Duración promedio de anotación.
+- Percentil 95 (`p95`) de duración.
+
+Para esta consulta se utilizan los eventos de estado `anotada`, donde se encuentra la duración correspondiente al proceso de anotación.
+
+#### Q4 — Tasa de rechazo por cliente y proyecto
+
+Analiza las tareas revisadas y rechazadas agrupándolas por cliente y proyecto.
+
+La consulta contabiliza las tareas revisadas y las tareas rechazadas para calcular la tasa de rechazo correspondiente a cada combinación de cliente y proyecto.
+
+#### Q5 — Cumplimiento de SLA por cliente
+
+Analiza el tiempo transcurrido entre la apertura y la aprobación de cada tarea.
+
+La consulta relaciona los eventos de apertura (`abierta`) con los eventos de aprobación (`aprobada`), calcula el tiempo transcurrido y lo compara con el SLA definido para cada tarea.
+
+Los resultados se agrupan por cliente y contienen métricas de tiempo, incluyendo percentiles, así como el porcentaje de tareas que exceden su SLA.
+
+---
+
+### Endpoints implementados
+
+El servicio Analítica expone los siguientes endpoints:
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| `GET` | `/salud` | Verifica que el servicio esté disponible y que Spark pueda inicializarse. |
+| `GET` | `/estadisticas` | Devuelve la cantidad de eventos únicos disponibles en el dataset analítico. |
+| `GET` | `/q1` | Ejecuta la consulta analítica Q1. |
+| `GET` | `/q2` | Ejecuta la consulta analítica Q2. |
+| `GET` | `/q3` | Ejecuta la consulta analítica Q3. |
+| `GET` | `/q4` | Ejecuta la consulta analítica Q4. |
+| `GET` | `/q5` | Ejecuta la consulta analítica Q5. |
+| `GET` | `/q1/plan` | Permite inspeccionar el plan de ejecución de Q1. |
+| `GET` | `/q3/plan` | Permite inspeccionar el plan de ejecución de Q3. |
+| `POST` | `/actualizar` | Limpia la caché del dataset y vuelve a leer, deduplicar y materializar los eventos del Datalake. |
+
+---
+
+### Cómo levantar el servicio Analítica
+
+Desde la raíz del repositorio `proyecto2`, ejecutar:
+
+```bash
+docker compose -f docker-compose.analitica.yml up -d --build
+```
+
+El comando construye la imagen de Analítica e inicia el contenedor.
+
+Para verificar que el contenedor está ejecutándose:
+
+```bash
+docker ps
+```
+
+El servicio debe aparecer como:
+
+```text
+analitica
+```
+
+Para observar los logs de inicialización:
+
+```bash
+docker logs -f analitica
+```
+
+Durante la inicialización se realizan las operaciones de lectura, deduplicación, persistencia y materialización del dataset.
+
+Los logs permiten verificar que el dataset esté preparado para recibir consultas.
+
+---
+
+### Verificar el servicio
+
+Consultar el endpoint de salud:
+
+```bash
+curl http://localhost:8004/salud
+```
+
+El endpoint verifica que el servicio esté disponible y que Spark haya sido inicializado.
+
+---
+
+### Consultar estadísticas del dataset
+
+Para obtener la cantidad de eventos únicos cargados en Analítica:
+
+```bash
+curl http://localhost:8004/estadisticas
+```
+
+La respuesta contiene el total de eventos únicos disponibles en el DataFrame analítico.
+
+El resultado obtenido durante las pruebas fue:
+
+```json
+{
+  "eventos_unicos": 976087
+}
+```
+
+Este resultado confirma que Spark pudo leer el Datalake y obtener el dataset deduplicado utilizado por las consultas analíticas.
+
+---
+
+### Ejecutar las consultas analíticas
+
+Las consultas se pueden ejecutar individualmente mediante HTTP.
+
+#### Q1
+
+```bash
+curl http://localhost:8004/q1
+```
+
+#### Q2
+
+```bash
+curl http://localhost:8004/q2
+```
+
+#### Q3
+
+```bash
+curl http://localhost:8004/q3
+```
+
+#### Q4
+
+```bash
+curl http://localhost:8004/q4
+```
+
+#### Q5
+
+```bash
+curl http://localhost:8004/q5
+```
+
+Cada endpoint devuelve:
+
+- Identificador de la consulta.
+- Cantidad de resultados obtenidos.
+- Tiempo de ejecución de la consulta.
+- Resultados analíticos en formato JSON.
+
+El tiempo reportado corresponde a la ejecución de la consulta sobre el dataset preparado y persistido, no al tiempo completo de inicialización de Spark ni a la lectura inicial del Datalake.
+
+---
+
+### Inspección de planes de ejecución
+
+El servicio permite consultar el plan de ejecución de algunas consultas para analizar cómo Spark procesa las operaciones.
+
+Para Q1:
+
+```bash
+curl http://localhost:8004/q1/plan
+```
+
+Para Q3:
+
+```bash
+curl http://localhost:8004/q3/plan
+```
+
+Estos endpoints permiten inspeccionar el plan de ejecución de Spark, incluyendo las operaciones que componen el procesamiento de los DataFrames.
+
+---
+
+### Actualizar el dataset
+
+Cuando se agregan nuevos eventos al Datalake y se desea que Analítica vuelva a procesarlos, se puede utilizar el endpoint:
+
+```bash
+curl -X POST http://localhost:8004/actualizar
+```
+
+El proceso realiza:
+
+1. Limpieza de la caché anterior.
+2. Liberación del DataFrame persistido.
+3. Nueva lectura del Datalake.
+4. Deduplicación por `event_id`.
+5. Persistencia del nuevo dataset.
+6. Materialización mediante `count()`.
+
+Esto permite actualizar el dataset analítico sin necesidad de recrear manualmente el contenedor.
+
+---
+
+## Validación funcional de Analítica
+
+Se implementó un script de pruebas controladas para verificar los resultados de las consultas Q1–Q5.
+
+El script utiliza datos de prueba diseñados para comprobar diferentes escenarios, incluyendo cantidades de tareas, agrupaciones, duraciones, tasas y cumplimiento de SLA.
+
+Las pruebas se ejecutan mediante:
+
+```bash
+python pruebas/analitica_controlada.py validar
+```
+
+La validación comprueba los resultados esperados de las cinco consultas.
+
+| Consulta | Pruebas realizadas | Resultado |
+|---|---:|---|
+| Q1 | 3 | PASS |
+| Q2 | 6 | PASS |
+| Q3 | 6 | PASS |
+| Q4 | 6 | PASS |
+| Q5 | 7 | PASS |
+| **Total** | **28** | **28/28 PASS** |
+
+Se obtuvo un resultado de **28 pruebas exitosas y 0 fallidas**.
+
+La validación permite verificar que las consultas producen los resultados esperados para los casos controlados antes de realizar las mediciones sobre el Datalake real.
+
+La evidencia de esta validación se encuentra en:
+
+```text
+evidence/validacion_analitica.txt
+```
+
+---
+
+## Benchmark de Analítica
+
+Se realizaron pruebas de rendimiento utilizando el Datalake real de eventos almacenados en Parquet.
+
+El benchmark mide:
+
+- Tiempo de preparación del dataset.
+- Tiempo de ejecución inicial de las consultas.
+- Tiempo promedio de las consultas después de la preparación del dataset.
+- Comparación del rendimiento utilizando diferentes cantidades de workers locales de Spark.
+
+Las pruebas se realizaron sobre el Datalake existente, sin regenerar ni modificar los eventos almacenados.
+
+### Dataset utilizado
+
+| Característica | Valor |
+|---|---:|
+| Eventos únicos | 976,087 |
+| Archivos Parquet | 2,249 |
+| Tamaño aproximado | 91 MB |
+| Formato | Parquet |
+| Período de datos | Noviembre 2025 – Noviembre 2026 |
+
+---
+
+### Entorno de benchmark en WSL
+
+Las pruebas experimentales se realizaron utilizando WSL Ubuntu, con Python, Java 17 y PySpark, permitiendo ejecutar Spark directamente en el entorno Linux.
+
+#### Instalación de dependencias
+
+Actualizar los paquetes del sistema:
+
+```bash
+sudo apt update
+```
+
+Instalar Python, herramientas de entornos virtuales y Java 17:
+
+```bash
+sudo apt install -y python3 python3-venv python3-pip openjdk-17-jdk
+```
+
+Verificar la versión de Java:
+
+```bash
+java -version
+```
+
+#### Configuración de Java 17
+
+Definir la variable `JAVA_HOME` y actualizar el `PATH`:
+
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export PATH="$JAVA_HOME/bin:$PATH"
+```
+
+#### Crear el entorno virtual de Python
+
+Desde la raíz del repositorio:
+
+```bash
+python3 -m venv .venv
+```
+
+Activar el entorno virtual:
+
+```bash
+source .venv/bin/activate
+```
+
+Actualizar `pip`:
+
+```bash
+python -m pip install --upgrade pip
+```
+
+Instalar PySpark:
+
+```bash
+python -m pip install --upgrade pyspark
+```
+
+Verificar la versión instalada:
+
+```bash
+python -c "import pyspark; print('PySpark:', pyspark.__version__)"
+```
+
+#### Configuración de variables de entorno
+
+Desde la raíz del proyecto, con el entorno virtual activado:
+
+```bash
+source .venv/bin/activate
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export PATH="$JAVA_HOME/bin:$PATH"
+export SPARK_WORKERS=1
+export DATA_LAKE="$(pwd)/datalake/eventos"
+```
+
+Las variables utilizadas son:
+
+| Variable | Descripción |
+|---|---|
+| `JAVA_HOME` | Define la ubicación de la instalación de Java 17. |
+| `PATH` | Permite ejecutar las herramientas de Java desde la terminal. |
+| `SPARK_WORKERS` | Define la cantidad de workers locales de Spark utilizados en las pruebas. |
+| `DATA_LAKE` | Define la ruta del Datalake de eventos que será procesado. |
+
+Para realizar pruebas utilizando dos workers:
+
+```bash
+export SPARK_WORKERS=2
+```
+
+---
+
+### Ejecución del benchmark
+
+Para ejecutar las mediciones utilizando un worker local:
+
+```bash
+export SPARK_WORKERS=1
+python pruebas/analitica_controlada.py benchmark --repeticiones 5
+```
+
+Para ejecutar las mediciones utilizando dos workers locales:
+
+```bash
+export SPARK_WORKERS=2
+python pruebas/analitica_controlada.py benchmark --repeticiones 5
+```
+
+También se puede ejecutar la comparación automatizada de configuraciones:
+
+```bash
+python pruebas/analitica_controlada.py workers --repeticiones 5
+```
+
+Este comando ejecuta las pruebas utilizando `local[1]` y `local[2]`, permitiendo comparar el tiempo de preparación del dataset y el tiempo promedio de ejecución de las consultas Q1–Q5.
+
+---
+
+### Resultados de preparación del dataset
+
+La preparación del dataset incluye la lectura de los archivos Parquet, deduplicación de eventos, persistencia y materialización del DataFrame.
+
+| Configuración | Tiempo de preparación |
+|---|---:|
+| 1 worker (`local[1]`) | 227.3536 s |
+| 2 workers (`local[2]`) | 134.7437 s |
+
+Utilizar dos workers redujo el tiempo de preparación aproximadamente un **40.7%**.
+
+---
+
+### Comparación de tiempo promedio de consultas
+
+Los siguientes resultados corresponden al promedio de cinco ejecuciones de cada consulta después de preparar el dataset.
+
+| Consulta | 1 worker (s) | 2 workers (s) | Speedup | Reducción |
+|---|---:|---:|---:|---:|
+| Q1 | 1.3606 | 1.3322 | 1.02× | 2.1% |
+| Q2 | 2.6840 | 2.0452 | 1.31× | 23.8% |
+| Q3 | 1.3129 | 0.8164 | 1.61× | 37.8% |
+| Q4 | 2.4142 | 1.5799 | 1.53× | 34.6% |
+| Q5 | 6.6071 | 1.9414 | 3.40× | 70.6% |
+
+---
+
+### Comparación del tiempo total de consultas
+
+Sumando los tiempos promedio de las cinco consultas:
+
+| Configuración | Tiempo total Q1–Q5 |
+|---|---:|
+| 1 worker | 15.3790 s |
+| 2 workers | 7.7150 s |
+
+El uso de dos workers redujo el tiempo agregado de las consultas aproximadamente un **49.8%**, con un speedup agregado cercano a **1.99×**.
+
+---
+
+### Tiempo de preparación más consultas
+
+Para comparar el tiempo de preparación del dataset junto con las cinco consultas analíticas:
+
+| Configuración | Preparación | Consultas | Total |
+|---|---:|---:|---:|
+| 1 worker | 227.3536 s | 15.3790 s | 242.7326 s |
+| 2 workers | 134.7437 s | 7.7150 s | 142.4587 s |
+
+La configuración de dos workers redujo el tiempo total combinado aproximadamente un **41.3%**, representando un ahorro aproximado de **100.27 segundos** bajo las condiciones de prueba.
+
+---
+
+### Análisis de resultados
+
+Los resultados muestran que la cantidad de workers locales afecta tanto la preparación del dataset como el tiempo de ejecución de las consultas analíticas.
+
+- **Q1:** presentó una mejora pequeña, debido a que su tiempo de ejecución fue similar con ambas configuraciones.
+- **Q2:** presentó una mejora moderada al utilizar dos workers.
+- **Q3:** presentó una reducción importante del tiempo de ejecución.
+- **Q4:** presentó una mejora significativa utilizando dos workers.
+- **Q5:** fue la consulta con mayor mejora, reduciendo su tiempo promedio aproximadamente un 70.6%.
+
+La configuración de dos workers obtuvo mejores resultados en la preparación del dataset y en el tiempo agregado de las consultas.
+
+Para las pruebas experimentales realizadas en WSL, `local[2]` presentó el mejor rendimiento entre las configuraciones comparadas.
+
+Estos resultados corresponden al entorno experimental utilizado y no representan una garantía de rendimiento en otros equipos o entornos de ejecución. La configuración del servicio Analítica en Docker se mantiene independiente de los resultados del benchmark local.
+
+---
+
+### Evidencia generada
+
+Los resultados de las pruebas se almacenaron en los siguientes archivos:
+
+| Archivo | Contenido |
+|---|---|
+| `evidence/validacion_analitica.txt` | Resultados de la validación funcional de Q1–Q5, con 28 pruebas exitosas. |
+| `evidence/benchmark_analitica.txt` | Resultados detallados del benchmark y comparación de workers. |
+| `evidence/resumen_analitica.txt` | Resumen de los resultados y conclusiones del benchmark. |
+
+---
+
+### Estado actual — Analítica
+
+- Servicio FastAPI de Analítica implementado.
+- Apache Spark integrado mediante PySpark.
+- Configuración de Spark en modo local.
+- Lectura del Datalake Parquet completada.
+- Dataset histórico deduplicado mediante `event_id`.
+- Dataset persistido utilizando `MEMORY_AND_DISK`.
+- Materialización del dataset durante la inicialización del servicio.
+- Endpoint `/salud` verificado.
+- Endpoint `/estadisticas` verificado.
+- 976,087 eventos únicos disponibles en el dataset analítico.
+- Consulta Q1 implementada y validada.
+- Consulta Q2 implementada y validada.
+- Consulta Q3 implementada y validada.
+- Consulta Q4 implementada y validada.
+- Consulta Q5 implementada y validada.
+- Endpoints de inspección de planes de ejecución implementados para Q1 y Q3.
+- Endpoint de actualización del dataset implementado.
+- Optimización mediante reutilización del DataFrame persistido.
+- Validación funcional completada: 28/28 pruebas PASS.
+- Benchmark ejecutado sobre el Datalake real.
+- Comparación experimental realizada entre `local[1]` y `local[2]`.
+- `local[2]` obtuvo mejores resultados en preparación del dataset y tiempo agregado de consultas bajo las condiciones de prueba.
+

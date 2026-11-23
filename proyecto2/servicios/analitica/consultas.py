@@ -6,8 +6,14 @@ from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 
 
-DATA_LAKE = os.getenv("DATA_LAKE", "/datalake/eventos")
-SPARK_WORKERS = int(os.getenv("SPARK_WORKERS", "1"))
+def obtener_ruta_datalake():
+    return os.path.abspath(
+        os.getenv("DATA_LAKE", "/datalake/eventos")
+)
+
+
+def obtener_num_workers():
+    return max(1, int(os.getenv("SPARK_WORKERS", "1")))
 
 
 # ============================================================
@@ -16,19 +22,27 @@ SPARK_WORKERS = int(os.getenv("SPARK_WORKERS", "1"))
 
 @lru_cache(maxsize=1)
 def obtener_spark():
+
+    workers = obtener_num_workers()
+
     spark = (
         SparkSession.builder
         .appName("Proyecto2-Analitica")
-        .master(f"local[{SPARK_WORKERS}]")
-        .config("spark.sql.shuffle.partitions", str(SPARK_WORKERS))
+        .master(f"local[{workers}]")
+        .config("spark.sql.shuffle.partitions", str(workers))
         .config("spark.sql.adaptive.enabled", "true")
         .config("spark.sql.parquet.filterPushdown", "true")
         .getOrCreate()
     )
 
     spark.sparkContext.setLogLevel("WARN")
-    return spark
 
+    print(
+        f"[Analitica] Spark iniciado con local[{workers}]",
+        flush=True
+    )
+
+    return spark
 
 # ============================================================
 # Datalake
@@ -36,21 +50,34 @@ def obtener_spark():
 
 @lru_cache(maxsize=1)
 def obtener_eventos():
-    spark = obtener_spark()
 
-    print("[Analitica] Leyendo Datalake Parquet...", flush=True)
+    spark = obtener_spark()
+    data_lake = obtener_ruta_datalake()
+
+    if not os.path.isdir(data_lake):
+        raise FileNotFoundError(
+            f"[Analitica] Datalake no encontrado: {data_lake}"
+        )
+
+    print(
+        f"[Analitica] Leyendo Datalake: {data_lake}",
+        flush=True
+    )
 
     df = (
         spark.read
-        .option("basePath", DATA_LAKE)
-        .parquet(DATA_LAKE)
+        .option("basePath", data_lake)
+        .parquet(data_lake)
     )
 
     print("[Analitica] Eliminando duplicados...", flush=True)
 
     df = df.dropDuplicates(["event_id"])
 
-    print("[Analitica] Persistiendo dataset en MEMORY_AND_DISK...", flush=True)
+    print(
+        "[Analitica] Persistiendo dataset en MEMORY_AND_DISK...",
+        flush=True
+    )
 
     df = df.persist(StorageLevel.MEMORY_AND_DISK)
 
@@ -58,7 +85,10 @@ def obtener_eventos():
 
     cantidad = df.count()
 
-    print(f"[Analitica] Dataset preparado: {cantidad} eventos únicos.", flush=True)
+    print(
+        f"[Analitica] Dataset preparado: {cantidad} eventos únicos.",
+        flush=True
+    )
 
     return df
 

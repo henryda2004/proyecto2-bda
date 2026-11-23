@@ -1,0 +1,55 @@
+============================================================
+EVIDENCIAS DEL COMPONENTE DE ANALITICA
+Proyecto 2 - Base de Datos
+============================================================
+
+1. VALIDACION FUNCIONAL
+------------------------------------------------------------
+Archivo:
+validacion_analitica.txt
+
+Resultado:
+28 de 28 pruebas PASS.
+0 pruebas fallidas.
+
+Las consultas Q1, Q2, Q3, Q4 y Q5 fueron verificadas
+con datos de prueba controlados y resultados esperados.
+
+2. BENCHMARK DE RENDIMIENTO
+------------------------------------------------------------
+Archivo:
+benchmark_analitica.txt
+
+Dataset:
+976087 eventos unicos del Datalake Parquet.
+
+Configuraciones:
+Spark local[1] y Spark local[2].
+
+Preparacion dataset:
+  local[1]: 227.3536 s
+  local[2]: 134.7437 s
+  Mejora:   40.7%
+
+Tiempo promedio warm acumulado Q1-Q5:
+  local[1]: 15.379 s
+  local[2]:  7.715 s
+  Mejora:   49.8%
+
+Preparacion + consultas warm:
+  local[1]: 242.7326 s
+  local[2]: 142.4587 s
+  Mejora:   41.3%
+
+3. CONCLUSION GENERAL
+------------------------------------------------------------
+La analitica supero la validacion funcional de Q1-Q5.
+
+El benchmark sobre el Datalake real demuestra que aumentar
+de un worker a dos workers mejora el rendimiento medido
+tanto en la preparacion del dataset como en las consultas.
+
+Se conserva local[2] como configuracion de referencia
+para los experimentos de rendimiento actuales.
+
+============================================================
