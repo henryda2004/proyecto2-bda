@@ -141,7 +141,7 @@ def startup():
 def salud():
     return {
         "servicio": "historial",
-        "estado": "ok",
+        "estado": "operativo",
     }
 
 

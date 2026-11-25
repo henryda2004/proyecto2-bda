@@ -10,6 +10,8 @@ services:
     environment:
       REGISTRO_URL: http://registro:8000
       SESION_URL: http://sesion:8000
+      HISTORIAL_URL: http://historial:8003
+      ANALITICA_URL: http://analitica:8004
     ports:
       - "8000:8000"
     depends_on:

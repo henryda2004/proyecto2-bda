@@ -54,7 +54,10 @@ async def identificar_solicitud(request: Request, call_next):
     return respuesta
 
 
-async def reenviar(request: Request, metodo: str, ruta: str, datos=None, *, servicio="registro"):
+async def reenviar(
+    request: Request, metodo: str, ruta: str, datos=None, *,
+    servicio="registro", timeout=None,
+):
     try:
         respuesta = await request.app.state.http.request(
             metodo,
@@ -62,6 +65,7 @@ async def reenviar(request: Request, metodo: str, ruta: str, datos=None, *, serv
             json=datos,
             params=request.query_params.multi_items(),
             headers={"X-Request-ID": request.state.request_id},
+            **({} if timeout is None else {"timeout": timeout}),
         )
     except httpx.RequestError:
         detalle = (
@@ -79,6 +83,40 @@ async def reenviar(request: Request, metodo: str, ruta: str, datos=None, *, serv
         status_code=respuesta.status_code,
         headers=headers,
     )
+
+
+TAREAS_EN_SEGUNDO_PLANO = set()
+
+
+async def publicar_evento(cliente, request_id, evento):
+    """Entrega al historial el evento de una transicion que el registro ya confirmo."""
+    if not evento:
+        return
+    try:
+        respuesta = await cliente.post(
+            f"{SERVICIOS['historial']}/eventos",
+            json=evento,
+            headers={"X-Request-ID": request_id},
+            timeout=5.0,
+        )
+        if not respuesta.is_success:
+            logging.warning(
+                "El historial rechazo el evento %s con HTTP %s",
+                evento.get("event_id"), respuesta.status_code,
+            )
+    except httpx.RequestError:
+        logging.warning(
+            "El historial no esta disponible, el evento %s no se registro",
+            evento.get("event_id"),
+        )
+
+
+def enviar_al_historial(request: Request, evento):
+    tarea = asyncio.create_task(
+        publicar_evento(request.app.state.http, request.state.request_id, evento)
+    )
+    TAREAS_EN_SEGUNDO_PLANO.add(tarea)
+    tarea.add_done_callback(TAREAS_EN_SEGUNDO_PLANO.discard)
 
 
 async def consultar_salud(cliente, url):
@@ -182,6 +220,7 @@ async def siguiente_tarea(request: Request, datos: dict):
     )
     if sesion.status_code == 201:
         cuerpo["borrador"] = json.loads(sesion.body)["borrador"]
+        enviar_al_historial(request, cuerpo.get("evento"))
         return cuerpo
 
     await cerrar_lock(request, tarea["id"], propietario)
@@ -260,6 +299,7 @@ async def enviar_tarea(tarea_id: str, request: Request, datos: EnvioIn):
         {**datos.model_dump(), "accion": "enviar"},
     )
     if respuesta.status_code == 200:
+        enviar_al_historial(request, json.loads(respuesta.body).get("evento"))
         await cerrar_lock(request, tarea_id, propietario)
     return respuesta
 
@@ -281,9 +321,35 @@ class RevisionIn(BaseModel):
 @app.post("/tareas/{tarea_id}/revision")
 async def revisar_tarea(tarea_id: str, request: Request, datos: RevisionIn):
     tarea = quote(tarea_id, safe="")
-    return await reenviar(
+    respuesta = await reenviar(
         request,
         "POST",
         f"/tareas/{tarea}/transicion",
         datos.model_dump(exclude_none=True),
+    )
+    if respuesta.status_code == 200:
+        enviar_al_historial(request, json.loads(respuesta.body).get("evento"))
+    return respuesta
+
+
+CONSULTAS = {"q1", "q2", "q3", "q4", "q5"}
+
+
+@app.get("/analitica/{consulta}")
+async def analitica(consulta: str, request: Request, conjunto: str = "principal"):
+    if consulta not in CONSULTAS:
+        return JSONResponse(
+            status_code=404, content={"detail": "Consulta desconocida, use q1 a q5"}
+        )
+    if conjunto not in {"principal", "ampliado"}:
+        return JSONResponse(
+            status_code=422, content={"detail": "El conjunto debe ser principal o ampliado"}
+        )
+    if conjunto == "ampliado":
+        return JSONResponse(
+            status_code=501,
+            content={"detail": "El conjunto ampliado no esta disponible en esta entrega"},
+        )
+    return await reenviar(
+        request, "GET", f"/{consulta}", servicio="analitica", timeout=180.0
     )

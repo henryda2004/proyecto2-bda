@@ -5,7 +5,7 @@ services:
     container_name: historial
     restart: unless-stopped
     ports:
-      - "8003:8003"
+      - "127.0.0.1:8003:8003"
     environment:
       HISTORIAL_DB: /data/historial.db
       DATA_LAKE: /datalake/eventos
@@ -14,6 +14,8 @@ services:
     volumes:
       - historial_data:/data
       - ./datalake/eventos:/datalake/eventos
+    networks:
+      - backend
     healthcheck:
       test:
         - CMD

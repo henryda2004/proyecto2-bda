@@ -102,7 +102,7 @@ def salud():
 
         return {
             "servicio": "analitica",
-            "estado": "ok",
+            "estado": "operativo",
             "spark": "activo",
             "master": spark.sparkContext.master,
         }

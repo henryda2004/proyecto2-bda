@@ -111,7 +111,14 @@ def limpiar_cache():
 # ============================================================
 
 def plan_consulta(df, modo="formatted"):
-    return df._jdf.queryExecution().explainString(modo)
+    # df.explain imprime el plan; se captura la salida para devolverlo en JSON.
+    import contextlib
+    import io
+
+    salida = io.StringIO()
+    with contextlib.redirect_stdout(salida):
+        df.explain(mode=modo)
+    return salida.getvalue()
 
 
 # ============================================================
