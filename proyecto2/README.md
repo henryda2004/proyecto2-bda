@@ -12,6 +12,31 @@
 
 ---
 
+## Inicio rápido (entorno limpio)
+
+Requisitos previos: Docker Desktop con Docker Compose v2, Python 3.11 o superior, Git y, en Windows, Git Bash para ejecutar los `.sh`. Todos los comandos se ejecutan desde la carpeta `proyecto2/`.
+
+1. Levantar todo el sistema (MongoDB en réplica, registro, sesión con Valkey, historial, analítica y gateway):
+   `bash scripts/setup.sh`
+2. Cargar los datos del registro y del historial: ver `datos/README.md`.
+3. Verificar la salud por capa: `curl http://127.0.0.1:8000/salud` debe responder `operativo` en registro, sesión, historial y analítica.
+4. Recorrido completo de una tarea LiDAR con evidencia (P4): `python pruebas/p4_recorrido_lidar.py`.
+5. Consultas analíticas por el gateway: `curl http://127.0.0.1:8000/analitica/q1` (q1 a q5).
+
+Solo el gateway publica un puerto al host (8000). Registro (8001), historial (8003) y analítica (8004) se publican únicamente en 127.0.0.1 para administración; MongoDB y Valkey no se publican.
+
+Para apagar: `docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.gateway.yml -f docker-compose.historial.yml -f docker-compose.analitica.yml down` (agregar `-v` para borrar los volúmenes).
+
+### Solución de problemas
+
+- `analitica` aparece `caido` y su log dice `UNABLE_TO_INFER_SCHEMA`: el datalake está vacío. Genere el historial (`datos/README.md`) y reinicie `analitica`.
+- Docker Desktop en Windows indica que Virtual Machine Platform no está habilitado o que WSL no responde: habilite la característica, ejecute `wsl --update` y `wsl --shutdown`, y reinicie Docker Desktop.
+- `setup.sh` falla con rutas duplicadas: ejecútelo desde `proyecto2/` o con la ruta `scripts/setup.sh`; el script cambia solo a la carpeta correcta.
+- Un `curl` en PowerShell devuelve HTML o pide parámetros: use `curl.exe` en lugar de `curl`.
+- Analítica tarda en responder después de arrancar: Spark lee y deduplica el datalake al iniciar; espere a que `/salud` la marque `operativo`.
+
+---
+
 ## Qué hace cada archivo (registro)
 
 | Archivo | Qué hace |

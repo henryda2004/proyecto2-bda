@@ -57,3 +57,26 @@ done
 
 echo "==> Estado del replica set"
 docker exec mongo1 mongosh "$URI" --quiet --eval "rs.status().members.map(m => m.name + ' ' + m.stateStr)"
+
+echo "==> Levantando gateway, sesion, historial y analitica"
+COMPOSE="docker compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.gateway.yml -f docker-compose.historial.yml -f docker-compose.analitica.yml"
+$COMPOSE up -d --build
+
+if [ -z "$(find datalake/eventos -name '*.parquet' 2>/dev/null | head -1)" ]; then
+  echo "    Aviso: el datalake esta vacio. Analitica no arranca sin archivos Parquet."
+  echo "    Genere el historial (ver datos/README.md) y luego ejecute:"
+  echo "    $COMPOSE restart analitica"
+fi
+
+echo "==> Esperando /salud del gateway (puerto 8000)"
+for i in $(seq 1 60); do
+  SALUD=$(curl -s http://127.0.0.1:8000/salud || true)
+  if echo "$SALUD" | grep -q '"estado":"operativo","capas"'; then
+    echo "    gateway operativo: $SALUD"
+    break
+  fi
+  if [ "$i" -eq 60 ]; then
+    echo "    el gateway no quedo operativo a tiempo. Ultima respuesta: $SALUD"
+  fi
+  sleep 3
+done

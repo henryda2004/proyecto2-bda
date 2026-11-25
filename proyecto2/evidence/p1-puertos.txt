@@ -1,0 +1,11 @@
+P1 puertos publicados 2026-11-25T04:56:30.898780+00:00
+NAME                  PORTS
+analitica             127.0.0.1:8004->8004/tcp
+historial             127.0.0.1:8003->8003/tcp
+mongo1                27017/tcp
+mongo2                27017/tcp
+mongo3                27017/tcp
+proyecto2-gateway-1   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+proyecto2-sesion-1    
+proyecto2-valkey-1    6379/tcp
+registro              127.0.0.1:8001->8000/tcp

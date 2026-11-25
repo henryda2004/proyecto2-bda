@@ -1,0 +1,861 @@
+{
+  "fecha_hora_utc": "2026-11-25T04:56:30.899786+00:00",
+  "objetivo": "Recorrido completo de una tarea LiDAR por el gateway; fila rechazada en Parquet y disponible en MongoDB; segundos entre HTTP 200 y visibilidad en Q1; reproceso de micro-lote y deduplicacion por event_id.",
+  "comando": "python pruebas/p4_recorrido_lidar.py",
+  "prueba_superada": true,
+  "detalle": "ver verificaciones",
+  "catalogo_usado": {
+    "c": "6bad6be2-8e7a-46e9-9f19-950499dd251d",
+    "a": "1a06703f-2b0c-444d-916d-3411502a93b6",
+    "r": "4d517c7a-8238-4ccc-acf5-e8063e18c088"
+  },
+  "tarea_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+  "tras_rechazo": {
+    "mongodb": {
+      "_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+      "estado": "disponible",
+      "version": 4,
+      "ultimo_evento_id": "3321cc5c-c7ea-4e40-ad97-5dbf8776d374"
+    },
+    "parquet": [
+      {
+        "event_id": "dc230d57-713a-4828-8023-0b286e4d6aa2",
+        "estado": "abierta",
+        "version": 1,
+        "motivo_rechazo": null,
+        "event_ts": "2026-11-25 04:56:12.247707+00:00"
+      },
+      {
+        "event_id": "97356ffc-ba7c-4d1e-b2f0-66a2617a1fae",
+        "estado": "anotada",
+        "version": 2,
+        "motivo_rechazo": null,
+        "event_ts": "2026-11-25 04:56:12.299455+00:00"
+      },
+      {
+        "event_id": "64c79420-9426-46f5-9e09-803b58906b05",
+        "estado": "en_revision",
+        "version": 3,
+        "motivo_rechazo": null,
+        "event_ts": "2026-11-25 04:56:12.318944+00:00"
+      },
+      {
+        "event_id": "3321cc5c-c7ea-4e40-ad97-5dbf8776d374",
+        "estado": "rechazada",
+        "version": 4,
+        "motivo_rechazo": "ETIQUETA_INCORRECTA",
+        "event_ts": "2026-11-25 04:56:12.331960+00:00"
+      }
+    ]
+  },
+  "q1_fila_lidar_hoy": [
+    {
+      "dia": "2026-11-25",
+      "modalidad": "lidar",
+      "tareas_aprobadas": 1
+    }
+  ],
+  "frescura": {
+    "hora_http_200_aprobacion": "2026-11-25T04:56:15.735531+00:00",
+    "segundos_hasta_visible_en_q1": 13.08,
+    "mecanismo": "flush del historial + POST /actualizar en analitica + GET /analitica/q1"
+  },
+  "final": {
+    "mongodb": {
+      "_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+      "estado": "aprobada",
+      "version": 8,
+      "ultimo_evento_id": "05c89357-fe0f-4be9-8eb6-fa8ca407d205"
+    },
+    "parquet": [
+      {
+        "event_id": "dc230d57-713a-4828-8023-0b286e4d6aa2",
+        "estado": "abierta",
+        "version": 1,
+        "motivo_rechazo": null,
+        "event_ts": "2026-11-25 04:56:12.247707+00:00"
+      },
+      {
+        "event_id": "97356ffc-ba7c-4d1e-b2f0-66a2617a1fae",
+        "estado": "anotada",
+        "version": 2,
+        "motivo_rechazo": null,
+        "event_ts": "2026-11-25 04:56:12.299455+00:00"
+      },
+      {
+        "event_id": "64c79420-9426-46f5-9e09-803b58906b05",
+        "estado": "en_revision",
+        "version": 3,
+        "motivo_rechazo": null,
+        "event_ts": "2026-11-25 04:56:12.318944+00:00"
+      },
+      {
+        "event_id": "3321cc5c-c7ea-4e40-ad97-5dbf8776d374",
+        "estado": "rechazada",
+        "version": 4,
+        "motivo_rechazo": "ETIQUETA_INCORRECTA",
+        "event_ts": "2026-11-25 04:56:12.331960+00:00"
+      },
+      {
+        "event_id": "30329975-9e07-484d-9a39-812d028e8e51",
+        "estado": "abierta",
+        "version": 5,
+        "motivo_rechazo": null,
+        "event_ts": "2026-11-25 04:56:15.668804+00:00"
+      },
+      {
+        "event_id": "04138188-3e83-4303-8f0e-48fb60fc68e3",
+        "estado": "anotada",
+        "version": 6,
+        "motivo_rechazo": null,
+        "event_ts": "2026-11-25 04:56:15.686025+00:00"
+      },
+      {
+        "event_id": "aa988a39-c002-4c8a-9c40-3386afefc4c7",
+        "estado": "en_revision",
+        "version": 7,
+        "motivo_rechazo": null,
+        "event_ts": "2026-11-25 04:56:15.718012+00:00"
+      },
+      {
+        "event_id": "05c89357-fe0f-4be9-8eb6-fa8ca407d205",
+        "estado": "aprobada",
+        "version": 8,
+        "motivo_rechazo": null,
+        "event_ts": "2026-11-25 04:56:15.728791+00:00"
+      }
+    ]
+  },
+  "reproceso": {
+    "eventos_reenviados": 8,
+    "respuesta": {
+      "recibidos": 8,
+      "procesados": 8,
+      "errores": [],
+      "resultados": [
+        {
+          "event_id": "dc230d57-713a-4828-8023-0b286e4d6aa2",
+          "recibido": true,
+          "duplicado": true
+        },
+        {
+          "event_id": "97356ffc-ba7c-4d1e-b2f0-66a2617a1fae",
+          "recibido": true,
+          "duplicado": true
+        },
+        {
+          "event_id": "64c79420-9426-46f5-9e09-803b58906b05",
+          "recibido": true,
+          "duplicado": true
+        },
+        {
+          "event_id": "3321cc5c-c7ea-4e40-ad97-5dbf8776d374",
+          "recibido": true,
+          "duplicado": true
+        },
+        {
+          "event_id": "30329975-9e07-484d-9a39-812d028e8e51",
+          "recibido": true,
+          "duplicado": true
+        },
+        {
+          "event_id": "04138188-3e83-4303-8f0e-48fb60fc68e3",
+          "recibido": true,
+          "duplicado": true
+        },
+        {
+          "event_id": "aa988a39-c002-4c8a-9c40-3386afefc4c7",
+          "recibido": true,
+          "duplicado": true
+        },
+        {
+          "event_id": "05c89357-fe0f-4be9-8eb6-fa8ca407d205",
+          "recibido": true,
+          "duplicado": true
+        }
+      ]
+    },
+    "total_antes": 166008,
+    "total_despues": 166008,
+    "duplicados_descartados": true,
+    "filas_parquet_de_la_tarea": 8,
+    "event_id_unicos_en_parquet": 8
+  },
+  "verificaciones": {
+    "mongo_disponible_tras_rechazo": true,
+    "parquet_tiene_rechazada": true,
+    "mongo_aprobada_al_final": true,
+    "parquet_tiene_aprobada": true,
+    "exportada": true,
+    "visible_en_q1": true,
+    "reproceso_sin_duplicados": true,
+    "event_id_unicos": true
+  },
+  "pasos": [
+    {
+      "paso": "crear proyecto LiDAR",
+      "hora_utc": "2026-11-25T04:56:12.201777+00:00",
+      "metodo": "POST",
+      "ruta": "/proyectos",
+      "http": 201,
+      "esperado": 201,
+      "x_request_id": "d05c8934-9814-4a4d-a1eb-4a03901d0acd",
+      "latencia_ms": 29.2,
+      "respuesta": {
+        "id": "04765428-57b5-4c82-8534-664e62db9b82",
+        "estado": "activo"
+      }
+    },
+    {
+      "paso": "registrar lote",
+      "hora_utc": "2026-11-25T04:56:12.226761+00:00",
+      "metodo": "POST",
+      "ruta": "/proyectos/04765428-57b5-4c82-8534-664e62db9b82/lotes",
+      "http": 201,
+      "esperado": 201,
+      "x_request_id": "97ee6517-dafc-4c78-8dd3-6a819dc824dc",
+      "latencia_ms": 13.6,
+      "respuesta": {
+        "id": "d8e1bacf-5788-4386-87c9-09e86342954b",
+        "tareas": 1
+      }
+    },
+    {
+      "paso": "siguiente tarea",
+      "hora_utc": "2026-11-25T04:56:12.259076+00:00",
+      "metodo": "POST",
+      "ruta": "/tareas/siguiente",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": "6d8940d7-eb99-4a82-8788-90afc355aa89",
+      "latencia_ms": 32.6,
+      "respuesta": {
+        "tarea": {
+          "id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+          "proyecto_id": "04765428-57b5-4c82-8534-664e62db9b82",
+          "uri": "s3://lidar-demo/frame-000123.pcd",
+          "sha256": "deb95cfef77ee265c7b7205158547c70ddaaad8bd44f4a9d57b6227d8b4003d7",
+          "bytes": 48213760,
+          "mime": "application/octet-stream",
+          "meta": {
+            "puntos": 1204000,
+            "x_min": -80.0,
+            "x_max": 80.0,
+            "z_min": -2.5,
+            "z_max": 6.0
+          },
+          "modalidad": "lidar",
+          "tipo_tarea": "cuboide_3d",
+          "taxonomia": [
+            {
+              "nombre": "lidar#peaton",
+              "instruccion": "Personas a pie"
+            },
+            {
+              "nombre": "lidar#vehiculo",
+              "instruccion": "Autos, buses y camiones"
+            },
+            {
+              "nombre": "lidar#ciclista",
+              "instruccion": "Bicicletas y skaters"
+            },
+            {
+              "nombre": "lidar#signal",
+              "instruccion": "Senales de transito"
+            }
+          ],
+          "reglas": "Un skater se clasifica como ciclista y no como peaton."
+        },
+        "vence_en": "2026-11-25T04:58:12.247000+00:00",
+        "evento": {
+          "event_id": "dc230d57-713a-4828-8023-0b286e4d6aa2",
+          "event_ts": "2026-11-25T04:56:12.247707+00:00",
+          "tarea_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+          "version": 1,
+          "estado": "abierta",
+          "cliente_id": "6bad6be2-8e7a-46e9-9f19-950499dd251d",
+          "proyecto_id": "04765428-57b5-4c82-8534-664e62db9b82",
+          "batch_id": "d8e1bacf-5788-4386-87c9-09e86342954b",
+          "anotador_id": "1a06703f-2b0c-444d-916d-3411502a93b6",
+          "equipo_id": "equipo-07",
+          "revisor_id": null,
+          "modalidad": "lidar",
+          "tipo_tarea": "cuboide_3d",
+          "duracion_seg": null,
+          "motivo_rechazo": null,
+          "sla_horas": 48
+        },
+        "borrador": null
+      }
+    },
+    {
+      "paso": "guardar borrador",
+      "hora_utc": "2026-11-25T04:56:12.292622+00:00",
+      "metodo": "PUT",
+      "ruta": "/tareas/6940eea8-f3f4-4a58-bb8d-699ea5d98a22/borrador",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": "511e2d3c-1805-4d6b-aa91-e67511c80ccd",
+      "latencia_ms": 32.9,
+      "respuesta": {
+        "tarea_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+        "tarea": {
+          "id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+          "proyecto_id": "04765428-57b5-4c82-8534-664e62db9b82",
+          "uri": "s3://lidar-demo/frame-000123.pcd",
+          "sha256": "deb95cfef77ee265c7b7205158547c70ddaaad8bd44f4a9d57b6227d8b4003d7",
+          "bytes": 48213760,
+          "mime": "application/octet-stream",
+          "meta": {
+            "puntos": 1204000,
+            "x_min": -80.0,
+            "x_max": 80.0,
+            "z_min": -2.5,
+            "z_max": 6.0
+          },
+          "modalidad": "lidar",
+          "tipo_tarea": "cuboide_3d",
+          "taxonomia": [
+            {
+              "nombre": "lidar#peaton",
+              "instruccion": "Personas a pie"
+            },
+            {
+              "nombre": "lidar#vehiculo",
+              "instruccion": "Autos, buses y camiones"
+            },
+            {
+              "nombre": "lidar#ciclista",
+              "instruccion": "Bicicletas y skaters"
+            },
+            {
+              "nombre": "lidar#signal",
+              "instruccion": "Senales de transito"
+            }
+          ],
+          "reglas": "Un skater se clasifica como ciclista y no como peaton."
+        },
+        "etapa": "editando",
+        "borrador": {
+          "datos": {
+            "cuboides": [
+              {
+                "etiqueta": "lidar#ciclista",
+                "centro": [
+                  12.4,
+                  -3.1,
+                  0.9
+                ],
+                "dimensiones": [
+                  1.8,
+                  0.6,
+                  1.7
+                ],
+                "yaw": 0.35
+              }
+            ]
+          },
+          "actualizado_en": "2026-11-25T04:56:12.290479+00:00"
+        },
+        "vence_en": "2026-11-25T04:58:12.284000+00:00"
+      }
+    },
+    {
+      "paso": "enviar anotacion",
+      "hora_utc": "2026-11-25T04:56:12.306015+00:00",
+      "metodo": "POST",
+      "ruta": "/tareas/6940eea8-f3f4-4a58-bb8d-699ea5d98a22/enviar",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": "249b3fcb-656e-403b-aec6-d90251c06b63",
+      "latencia_ms": 14.8,
+      "respuesta": {
+        "tarea_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+        "estado": "anotada",
+        "version": 2,
+        "evento": {
+          "event_id": "97356ffc-ba7c-4d1e-b2f0-66a2617a1fae",
+          "event_ts": "2026-11-25T04:56:12.299455+00:00",
+          "tarea_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+          "version": 2,
+          "estado": "anotada",
+          "cliente_id": "6bad6be2-8e7a-46e9-9f19-950499dd251d",
+          "proyecto_id": "04765428-57b5-4c82-8534-664e62db9b82",
+          "batch_id": "d8e1bacf-5788-4386-87c9-09e86342954b",
+          "anotador_id": "1a06703f-2b0c-444d-916d-3411502a93b6",
+          "equipo_id": "equipo-07",
+          "revisor_id": null,
+          "modalidad": "lidar",
+          "tipo_tarea": "cuboide_3d",
+          "duracion_seg": 0.052455,
+          "motivo_rechazo": null,
+          "sla_horas": 48
+        }
+      }
+    },
+    {
+      "paso": "segundo envio (debe ser 409)",
+      "hora_utc": "2026-11-25T04:56:12.310623+00:00",
+      "metodo": "POST",
+      "ruta": "/tareas/6940eea8-f3f4-4a58-bb8d-699ea5d98a22/enviar",
+      "http": 409,
+      "esperado": 409,
+      "x_request_id": "5be295eb-ceb0-4ca9-a313-b9ac0a1e8e9e",
+      "latencia_ms": 6.3,
+      "respuesta": {
+        "detail": "La sesión no está vigente"
+      }
+    },
+    {
+      "paso": "iniciar revision",
+      "hora_utc": "2026-11-25T04:56:12.326715+00:00",
+      "metodo": "POST",
+      "ruta": "/tareas/6940eea8-f3f4-4a58-bb8d-699ea5d98a22/revision",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": "2f3bb2e9-a643-499e-9c71-cd2472538f0c",
+      "latencia_ms": 12.6,
+      "respuesta": {
+        "tarea_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+        "estado": "en_revision",
+        "version": 3,
+        "evento": {
+          "event_id": "64c79420-9426-46f5-9e09-803b58906b05",
+          "event_ts": "2026-11-25T04:56:12.318944+00:00",
+          "tarea_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+          "version": 3,
+          "estado": "en_revision",
+          "cliente_id": "6bad6be2-8e7a-46e9-9f19-950499dd251d",
+          "proyecto_id": "04765428-57b5-4c82-8534-664e62db9b82",
+          "batch_id": "d8e1bacf-5788-4386-87c9-09e86342954b",
+          "anotador_id": "1a06703f-2b0c-444d-916d-3411502a93b6",
+          "equipo_id": "equipo-07",
+          "revisor_id": "4d517c7a-8238-4ccc-acf5-e8063e18c088",
+          "modalidad": "lidar",
+          "tipo_tarea": "cuboide_3d",
+          "duracion_seg": null,
+          "motivo_rechazo": null,
+          "sla_horas": 48
+        }
+      }
+    },
+    {
+      "paso": "rechazar con motivo",
+      "hora_utc": "2026-11-25T04:56:12.339241+00:00",
+      "metodo": "POST",
+      "ruta": "/tareas/6940eea8-f3f4-4a58-bb8d-699ea5d98a22/revision",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": "7e6816df-952b-4cc6-8369-436beb874bba",
+      "latencia_ms": 12.0,
+      "respuesta": {
+        "tarea_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+        "estado": "disponible",
+        "version": 4,
+        "evento": {
+          "event_id": "3321cc5c-c7ea-4e40-ad97-5dbf8776d374",
+          "event_ts": "2026-11-25T04:56:12.331960+00:00",
+          "tarea_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+          "version": 4,
+          "estado": "rechazada",
+          "cliente_id": "6bad6be2-8e7a-46e9-9f19-950499dd251d",
+          "proyecto_id": "04765428-57b5-4c82-8534-664e62db9b82",
+          "batch_id": "d8e1bacf-5788-4386-87c9-09e86342954b",
+          "anotador_id": "1a06703f-2b0c-444d-916d-3411502a93b6",
+          "equipo_id": "equipo-07",
+          "revisor_id": "4d517c7a-8238-4ccc-acf5-e8063e18c088",
+          "modalidad": "lidar",
+          "tipo_tarea": "cuboide_3d",
+          "duracion_seg": null,
+          "motivo_rechazo": "ETIQUETA_INCORRECTA",
+          "sla_horas": 48
+        }
+      }
+    },
+    {
+      "paso": "flush del historial",
+      "hora_utc": "2026-11-25T04:56:14.378398+00:00",
+      "metodo": "POST",
+      "ruta": "/flush",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": null,
+      "latencia_ms": 39.0,
+      "respuesta": {
+        "eventos_escritos": 4,
+        "archivos": [
+          "/datalake/eventos/mes=2026-11/batch_32134163b515b2d1.parquet"
+        ],
+        "mensaje": "Flush completado"
+      }
+    },
+    {
+      "paso": "siguiente tarea (retrabajo)",
+      "hora_utc": "2026-11-25T04:56:15.678580+00:00",
+      "metodo": "POST",
+      "ruta": "/tareas/siguiente",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": "5e0e9ada-309f-4450-b54a-34c712a797bc",
+      "latencia_ms": 15.6,
+      "respuesta": {
+        "tarea": {
+          "id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+          "proyecto_id": "04765428-57b5-4c82-8534-664e62db9b82",
+          "uri": "s3://lidar-demo/frame-000123.pcd",
+          "sha256": "deb95cfef77ee265c7b7205158547c70ddaaad8bd44f4a9d57b6227d8b4003d7",
+          "bytes": 48213760,
+          "mime": "application/octet-stream",
+          "meta": {
+            "puntos": 1204000,
+            "x_min": -80.0,
+            "x_max": 80.0,
+            "z_min": -2.5,
+            "z_max": 6.0
+          },
+          "modalidad": "lidar",
+          "tipo_tarea": "cuboide_3d",
+          "taxonomia": [
+            {
+              "nombre": "lidar#peaton",
+              "instruccion": "Personas a pie"
+            },
+            {
+              "nombre": "lidar#vehiculo",
+              "instruccion": "Autos, buses y camiones"
+            },
+            {
+              "nombre": "lidar#ciclista",
+              "instruccion": "Bicicletas y skaters"
+            },
+            {
+              "nombre": "lidar#signal",
+              "instruccion": "Senales de transito"
+            }
+          ],
+          "reglas": "Un skater se clasifica como ciclista y no como peaton."
+        },
+        "vence_en": "2026-11-25T04:58:15.668000+00:00",
+        "evento": {
+          "event_id": "30329975-9e07-484d-9a39-812d028e8e51",
+          "event_ts": "2026-11-25T04:56:15.668804+00:00",
+          "tarea_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+          "version": 5,
+          "estado": "abierta",
+          "cliente_id": "6bad6be2-8e7a-46e9-9f19-950499dd251d",
+          "proyecto_id": "04765428-57b5-4c82-8534-664e62db9b82",
+          "batch_id": "d8e1bacf-5788-4386-87c9-09e86342954b",
+          "anotador_id": "1a06703f-2b0c-444d-916d-3411502a93b6",
+          "equipo_id": "equipo-07",
+          "revisor_id": null,
+          "modalidad": "lidar",
+          "tipo_tarea": "cuboide_3d",
+          "duracion_seg": null,
+          "motivo_rechazo": null,
+          "sla_horas": 48
+        },
+        "borrador": {
+          "datos": {
+            "cuboides": [
+              {
+                "etiqueta": "lidar#ciclista",
+                "centro": [
+                  12.4,
+                  -3.1,
+                  0.9
+                ],
+                "dimensiones": [
+                  1.8,
+                  0.6,
+                  1.7
+                ],
+                "yaw": 0.35
+              }
+            ]
+          },
+          "actualizado_en": "2026-11-25T04:56:12.290479+00:00"
+        }
+      }
+    },
+    {
+      "paso": "enviar corregida",
+      "hora_utc": "2026-11-25T04:56:15.696244+00:00",
+      "metodo": "POST",
+      "ruta": "/tareas/6940eea8-f3f4-4a58-bb8d-699ea5d98a22/enviar",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": "2603d605-3e54-4527-974c-e648f65e2f6c",
+      "latencia_ms": 16.9,
+      "respuesta": {
+        "tarea_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+        "estado": "anotada",
+        "version": 6,
+        "evento": {
+          "event_id": "04138188-3e83-4303-8f0e-48fb60fc68e3",
+          "event_ts": "2026-11-25T04:56:15.686025+00:00",
+          "tarea_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+          "version": 6,
+          "estado": "anotada",
+          "cliente_id": "6bad6be2-8e7a-46e9-9f19-950499dd251d",
+          "proyecto_id": "04765428-57b5-4c82-8534-664e62db9b82",
+          "batch_id": "d8e1bacf-5788-4386-87c9-09e86342954b",
+          "anotador_id": "1a06703f-2b0c-444d-916d-3411502a93b6",
+          "equipo_id": "equipo-07",
+          "revisor_id": null,
+          "modalidad": "lidar",
+          "tipo_tarea": "cuboide_3d",
+          "duracion_seg": 0.018025,
+          "motivo_rechazo": null,
+          "sla_horas": 48
+        }
+      }
+    },
+    {
+      "paso": "iniciar revision 2",
+      "hora_utc": "2026-11-25T04:56:15.722997+00:00",
+      "metodo": "POST",
+      "ruta": "/tareas/6940eea8-f3f4-4a58-bb8d-699ea5d98a22/revision",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": "d2bfd4a7-c0d6-46f7-af32-ab5e29f0f580",
+      "latencia_ms": 28.5,
+      "respuesta": {
+        "tarea_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+        "estado": "en_revision",
+        "version": 7,
+        "evento": {
+          "event_id": "aa988a39-c002-4c8a-9c40-3386afefc4c7",
+          "event_ts": "2026-11-25T04:56:15.718012+00:00",
+          "tarea_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+          "version": 7,
+          "estado": "en_revision",
+          "cliente_id": "6bad6be2-8e7a-46e9-9f19-950499dd251d",
+          "proyecto_id": "04765428-57b5-4c82-8534-664e62db9b82",
+          "batch_id": "d8e1bacf-5788-4386-87c9-09e86342954b",
+          "anotador_id": "1a06703f-2b0c-444d-916d-3411502a93b6",
+          "equipo_id": "equipo-07",
+          "revisor_id": "4d517c7a-8238-4ccc-acf5-e8063e18c088",
+          "modalidad": "lidar",
+          "tipo_tarea": "cuboide_3d",
+          "duracion_seg": null,
+          "motivo_rechazo": null,
+          "sla_horas": 48
+        }
+      }
+    },
+    {
+      "paso": "aprobar",
+      "hora_utc": "2026-11-25T04:56:15.735531+00:00",
+      "metodo": "POST",
+      "ruta": "/tareas/6940eea8-f3f4-4a58-bb8d-699ea5d98a22/revision",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": "e9c07918-b4d6-4c8c-b370-52b7bf553c29",
+      "latencia_ms": 10.7,
+      "respuesta": {
+        "tarea_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+        "estado": "aprobada",
+        "version": 8,
+        "evento": {
+          "event_id": "05c89357-fe0f-4be9-8eb6-fa8ca407d205",
+          "event_ts": "2026-11-25T04:56:15.728791+00:00",
+          "tarea_id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+          "version": 8,
+          "estado": "aprobada",
+          "cliente_id": "6bad6be2-8e7a-46e9-9f19-950499dd251d",
+          "proyecto_id": "04765428-57b5-4c82-8534-664e62db9b82",
+          "batch_id": "d8e1bacf-5788-4386-87c9-09e86342954b",
+          "anotador_id": "1a06703f-2b0c-444d-916d-3411502a93b6",
+          "equipo_id": "equipo-07",
+          "revisor_id": "4d517c7a-8238-4ccc-acf5-e8063e18c088",
+          "modalidad": "lidar",
+          "tipo_tarea": "cuboide_3d",
+          "duracion_seg": null,
+          "motivo_rechazo": null,
+          "sla_horas": 48
+        }
+      }
+    },
+    {
+      "paso": "exportar aprobadas",
+      "hora_utc": "2026-11-25T04:56:15.745711+00:00",
+      "metodo": "GET",
+      "ruta": "/proyectos/04765428-57b5-4c82-8534-664e62db9b82/exportar?limite=10",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": "45ab1063-c083-414a-b1c6-441ef72f8915",
+      "latencia_ms": 9.5,
+      "respuesta": {
+        "tareas": [
+          {
+            "id": "6940eea8-f3f4-4a58-bb8d-699ea5d98a22",
+            "uri": "s3://lidar-demo/frame-000123.pcd",
+            "sha256": "deb95cfef77ee265c7b7205158547c70ddaaad8bd44f4a9d57b6227d8b4003d7",
+            "bytes": 48213760,
+            "mime": "application/octet-stream",
+            "meta": {
+              "puntos": 1204000,
+              "x_min": -80.0,
+              "x_max": 80.0,
+              "z_min": -2.5,
+              "z_max": 6.0
+            },
+            "modalidad": "lidar",
+            "tipo_tarea": "cuboide_3d",
+            "anotacion": {
+              "cuboides": [
+                {
+                  "etiqueta": "lidar#ciclista",
+                  "centro": [
+                    12.4,
+                    -3.1,
+                    0.9
+                  ],
+                  "dimensiones": [
+                    1.8,
+                    0.6,
+                    1.7
+                  ],
+                  "yaw": 0.35
+                }
+              ]
+            },
+            "revisado_por": "4d517c7a-8238-4ccc-acf5-e8063e18c088",
+            "aprobada_en": "2026-11-25T04:56:15.728000+00:00"
+          }
+        ],
+        "limite": 10,
+        "siguiente": null
+      }
+    },
+    {
+      "paso": "flush del historial",
+      "hora_utc": "2026-11-25T04:56:17.802987+00:00",
+      "metodo": "POST",
+      "ruta": "/flush",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": null,
+      "latencia_ms": 56.9,
+      "respuesta": {
+        "eventos_escritos": 4,
+        "archivos": [
+          "/datalake/eventos/mes=2026-11/batch_737b20e2e52f76bc.parquet"
+        ],
+        "mensaje": "Flush completado"
+      }
+    },
+    {
+      "paso": "actualizar dataset Spark",
+      "hora_utc": "2026-11-25T04:56:28.360486+00:00",
+      "metodo": "POST",
+      "ruta": "/actualizar",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": null,
+      "latencia_ms": 10557.4,
+      "respuesta": {
+        "estado": "ok",
+        "mensaje": "Dataset actualizado y materializado",
+        "eventos_unicos": 166008
+      }
+    },
+    {
+      "paso": "Q1 por gateway (intento 1)",
+      "hora_utc": "2026-11-25T04:56:28.811535+00:00",
+      "metodo": "GET",
+      "ruta": "/analitica/q1",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": "0555dd23-f1e3-41f4-82bc-bd6e016fc5c4",
+      "latencia_ms": 450.6
+    },
+    {
+      "paso": "estadisticas historial antes",
+      "hora_utc": "2026-11-25T04:56:30.512479+00:00",
+      "metodo": "GET",
+      "ruta": "/estadisticas",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": null,
+      "latencia_ms": 15.7,
+      "respuesta": {
+        "total": 166008,
+        "pendientes": 0,
+        "procesados": 166008
+      }
+    },
+    {
+      "paso": "reprocesar micro-lote (mismos eventos)",
+      "hora_utc": "2026-11-25T04:56:30.529626+00:00",
+      "metodo": "POST",
+      "ruta": "/eventos/lote",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": null,
+      "latencia_ms": 16.9,
+      "respuesta": {
+        "recibidos": 8,
+        "procesados": 8,
+        "errores": [],
+        "resultados": [
+          {
+            "event_id": "dc230d57-713a-4828-8023-0b286e4d6aa2",
+            "recibido": true,
+            "duplicado": true
+          },
+          {
+            "event_id": "97356ffc-ba7c-4d1e-b2f0-66a2617a1fae",
+            "recibido": true,
+            "duplicado": true
+          },
+          {
+            "event_id": "64c79420-9426-46f5-9e09-803b58906b05",
+            "recibido": true,
+            "duplicado": true
+          },
+          {
+            "event_id": "3321cc5c-c7ea-4e40-ad97-5dbf8776d374",
+            "recibido": true,
+            "duplicado": true
+          },
+          {
+            "event_id": "30329975-9e07-484d-9a39-812d028e8e51",
+            "recibido": true,
+            "duplicado": true
+          },
+          {
+            "event_id": "04138188-3e83-4303-8f0e-48fb60fc68e3",
+            "recibido": true,
+            "duplicado": true
+          },
+          {
+            "event_id": "aa988a39-c002-4c8a-9c40-3386afefc4c7",
+            "recibido": true,
+            "duplicado": true
+          },
+          {
+            "event_id": "05c89357-fe0f-4be9-8eb6-fa8ca407d205",
+            "recibido": true,
+            "duplicado": true
+          }
+        ]
+      }
+    },
+    {
+      "paso": "estadisticas historial despues",
+      "hora_utc": "2026-11-25T04:56:30.545567+00:00",
+      "metodo": "GET",
+      "ruta": "/estadisticas",
+      "http": 200,
+      "esperado": 200,
+      "x_request_id": null,
+      "latencia_ms": 16.0,
+      "respuesta": {
+        "total": 166008,
+        "pendientes": 0,
+        "procesados": 166008
+      }
+    }
+  ]
+}
