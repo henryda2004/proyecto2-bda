@@ -1,0 +1,344 @@
+\documentclass[conference]{IEEEtran}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{cite}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{url}
+\makeatletter\g@addto@macro\UrlBreaks{\do\-\do\_}\makeatother
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+
+\setlength{\tabcolsep}{3.5pt}
+\begin{document}
+\sloppy
+
+\title{Proyecto 2. Plataforma distribuida de anotación de datos}
+
+\author{
+\IEEEauthorblockN{Henry Núñez Pérez \quad Nicol Otárola Porras \quad Giancarlo Vega Marín}
+\IEEEauthorblockA{
+Carnés: 2022089224, 2021117282, 2020195338\\
+TI-4601 Bases de Datos Avanzadas\\
+Escuela de Administración de Tecnologías de Información\\
+Instituto Tecnológico de Costa Rica\\
+Repositorio: \url{https://github.com/henryda2004/proyecto2-bda}}
+}
+
+\maketitle
+
+\begin{abstract}
+Se construyó la capa de datos de una plataforma de anotación compuesta por un gateway REST, un registro operacional en MongoDB con tres nodos en réplica, un servicio de sesión sobre Valkey con AOF, un historial de eventos en archivos Parquet y un servicio de analítica con Apache Spark. Todas las cifras de este documento provienen de archivos de la carpeta \texttt{proyecto2/evidence/} del repositorio, cuyo nombre se indica junto a cada tabla. Las mediciones que no se realizaron se declaran como no disponibles.
+\end{abstract}
+
+\section{Arquitectura y recorrido de una tarea}
+
+La solución se ejecuta completa en contenedores Docker y se divide en cinco servicios con responsabilidades separadas (Fig.~\ref{fig:arq}). El gateway es el único componente que publica un puerto al host (8000). El registro, el historial y la analítica publican sus puertos solo en \texttt{127.0.0.1} para administración, y MongoDB y Valkey no publican puertos, como muestra \texttt{evidence/p1-puertos.txt}. El simulador de usuarios (\texttt{simulador/carga.py}) solo conoce la URL del gateway.
+
+El registro es la única fuente de verdad del estado vigente de una tarea y es el único servicio que habla con MongoDB. La sesión guarda candados, borradores y sesiones en Valkey, pero no decide el estado definitivo de una tarea. El historial recibe los eventos que el gateway le reenvía después de cada transición confirmada y los escribe en Parquet. La analítica lee el directorio Parquet montado en modo solo lectura y no consulta MongoDB ni el historial. La prueba \texttt{evidence/p1-aislamiento-registro.json} revisa el código del registro sin encontrar ninguna mención a Valkey y confirma que el registro es el único servicio con configuración de MongoDB.
+
+\begin{figure}[!t]
+\centering
+\begin{tikzpicture}[node distance=0.45cm and 0.5cm,
+  b/.style={draw, rounded corners, align=center, font=\footnotesize, minimum width=1.7cm, minimum height=0.6cm},
+  a/.style={-{Latex[length=1.5mm]}}]
+\node[b] (sim) {Simulador};
+\node[b, below=of sim] (gw) {Gateway\\:8000};
+\node[b, below left=0.6cm and 0.9cm of gw] (reg) {Registro};
+\node[b, below=of gw] (ses) {Sesión};
+\node[b, below right=0.6cm and 0.9cm of gw] (his) {Historial};
+\node[b, below=of reg] (mon) {MongoDB\\rs0 (3 nodos)};
+\node[b, below=of ses] (val) {Valkey\\AOF everysec};
+\node[b, below=of his] (pq) {Parquet\\mes=AAAA-MM};
+\node[b, right=0.4cm of gw] (an) {Analítica\\Spark};
+\draw[a] (sim) -- node[right,font=\scriptsize]{HTTP} (gw);
+\draw[a] (gw) -- (reg); \draw[a] (gw) -- (ses); \draw[a] (gw) -- (his); \draw[a] (gw) -- (an);
+\draw[a] (reg) -- (mon); \draw[a] (ses) -- (val); \draw[a] (his) -- (pq);
+\draw[a, dashed] (an.east) -- ++(0.35,0) |- node[pos=0.25,left,font=\scriptsize,align=right]{solo\\lectura} (pq.east);
+\end{tikzpicture}
+\caption{Servicios y almacenamientos. Solo el gateway recibe tráfico del simulador.}
+\label{fig:arq}
+\end{figure}
+
+La elección de motores sigue la naturaleza de cada dato. MongoDB guarda el estado vigente porque cada tarea es un documento con referencia al archivo, asignación, anotación y revisión de forma variable según la modalidad, y porque \texttt{find\_one\_and\_update} da asignación atómica sobre un solo documento, mientras el conjunto de tres nodos con \texttt{w:"majority"} tolera la caída de uno sin perder escrituras confirmadas. Valkey guarda candados, sesiones y borradores porque son datos temporales con expiración, que necesitan \texttt{SET NX PX} y operaciones en memoria de baja latencia, y AOF permite que un borrador sobreviva a un reinicio. Parquet guarda el historial porque es inmutable, se consulta por columnas y se particiona por mes, lo que conviene a lecturas analíticas masivas. Spark ejecuta Q1 a Q5 porque agrega cientos de miles de eventos en paralelo sin cargar a MongoDB, que queda dedicado a la operación.
+
+El recorrido completo de una tarea se ejecutó con un proyecto LiDAR de vehículos autónomos (\texttt{pruebas/p4\_recorrido\_lidar.py}, evidencia \url{evidence/p4-recorrido-lidar-20261125T045630Z.json}). El proyecto se creó con la taxonomía \texttt{lidar\#peaton}, \texttt{lidar\#vehiculo}, \texttt{lidar\#ciclista} y \texttt{lidar\#signal}, la regla de que un skater se clasifica como ciclista y un SLA de 48 horas. El lote registró una nube de puntos por su URI, SHA-256, tamaño, tipo MIME y metadatos de rango, sin guardar el archivo. La Tabla~\ref{tab:recorrido} resume cada paso, el código HTTP y dónde quedó cada dato.
+
+\begin{table}[!t]
+\caption{Recorrido de la tarea LiDAR (\texttt{p4-recorrido-lidar-20261125T045630Z.json}).}
+\label{tab:recorrido}
+\centering\footnotesize
+\begin{tabularx}{\columnwidth}{@{}p{2.1cm} c X@{}}
+\toprule
+\textbf{Paso} & \textbf{HTTP} & \textbf{Efecto} \\
+\midrule
+siguiente & 200 & Mongo \texttt{abierta}, candado y sesión en Valkey, fila \texttt{abierta} \\
+borrador & 200 & Borrador en Valkey, renueva el candado, sin fila \\
+enviar & 200 & Mongo \texttt{anotada}, fila \texttt{anotada} \\
+enviar otra vez & 409 & Sin cambios y sin fila \\
+revision iniciar & 200 & Mongo \texttt{en\_revision}, fila \texttt{en\_revision} \\
+revision rechazar & 200 & Mongo \texttt{disponible} (versión 4), fila \texttt{rechazada} con motivo \texttt{ETIQUETA\_INCORRECTA} \\
+retrabajo y aprobar & 200 & Mongo \texttt{aprobada} (versión 8), fila \texttt{aprobada} \\
+exportar & 200 & La tarea aparece entre las aprobadas \\
+analitica/q1 & 200 & Fila del día con modalidad \texttt{lidar} y una tarea \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+El segundo envío recibe 409 porque el registro solo acepta la acción \texttt{enviar} cuando el documento sigue en estado \texttt{abierta} y el token coincide. La actualización es un \texttt{find\_one\_and\_update} con ese filtro, de modo que tras el primer envío ningún documento cumple la condición y no se escribe fila en el datalake. El rechazo devuelve la tarea a \texttt{disponible} en MongoDB para que vuelva a la cola, mientras que el evento conserva el estado \texttt{rechazada}, porque la consulta Q4 necesita contar rechazos y MongoDB solo guarda el estado vigente.
+
+\section{Registro, índices y no doble adquisición}
+
+La base \texttt{plataforma} tiene las colecciones \texttt{clientes}, \texttt{proyectos}, \texttt{batches}, \texttt{tareas} y \texttt{anotadores}, con identificadores UUID. Cada tarea guarda la referencia al archivo, el estado, la asignación con su token, la anotación vigente, la última revisión, la versión y el identificador del último evento. El conjunto cargado contiene 60 clientes, 120 proyectos activos, 600 lotes, 60\,000 tareas y 300 anotadores (\texttt{evidence/dataset-registro-conteos.txt}). Las escrituras usan \texttt{w:"majority"}.
+
+Se crearon los cuatro índices pedidos y ninguno adicional. La Tabla~\ref{tab:indices} compara, con \texttt{explain}, los documentos examinados con índice y con un recorrido completo forzado.
+
+\begin{table}[!t]
+\caption{Efecto de los índices (\texttt{p2-indices-explain.json}).}
+\label{tab:indices}
+\centering\footnotesize
+\begin{tabular}{@{}l r r r r@{}}
+\toprule
+& \multicolumn{2}{c}{\textbf{Docs examinados}} & \multicolumn{2}{c}{\textbf{ms}} \\
+\textbf{Consulta} & índice & completo & índice & completo \\
+\midrule
+siguiente tarea & 1 & 60\,010 & 0 & 69 \\
+por anotador & 1 & 60\,010 & 0 & 38 \\
+por lote & 100 & 60\,010 & 0 & 41 \\
+por cliente & 2 & 121 & 0 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La asignación es atómica porque el paso de \texttt{disponible} (o \texttt{abierta} vencida) a \texttt{abierta} se hace con un único \texttt{find\_one\_and\_update}. En la prueba de 50 solicitudes concurrentes contra 10 tareas libres hubo 10 respuestas 200 y 40 respuestas 204, sin ninguna tarea asignada a dos personas. Un token incorrecto respondió 409, el primer envío 200 y el segundo 409. La latencia de esas 50 solicitudes fue p50 132.9 ms, p95 198.3 ms y p99 201.6 ms (\texttt{evidence/p2-concurrencia.json}).
+
+La Tabla~\ref{tab:wc} compara \texttt{w:1} con \texttt{w:"majority"} con 1000 escrituras cada uno. Con mayoría, la escritura espera a que un secundario confirme, y el p50 pasa de 1.00 ms a 2.51 ms. Esta diferencia corresponde a tres contenedores en la misma máquina, donde la red entre nodos es local. En un clúster repartido en varias máquinas la espera dependería de la latencia de red al secundario más cercano, por lo que este resultado no permite estimar ese costo.
+
+\begin{table}[!t]
+\caption{Write concern, 1000 muestras cada uno (\texttt{p2-write-concern.json}).}
+\label{tab:wc}
+\centering\footnotesize
+\begin{tabular}{@{}l r r r r@{}}
+\toprule
+\textbf{Modo} & \textbf{p50} & \textbf{p95} & \textbf{p99} & \textbf{media} \\
+\midrule
+\texttt{w:1} & 0.997 & 1.794 & 2.404 & 1.117 \\
+\texttt{w:"majority"} & 2.507 & 3.390 & 4.213 & 2.677 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Sesión, borrador y reinicio de Valkey}
+
+El candado \texttt{lock:tarea:\{id\}} se toma con \texttt{SET NX PX} de 120 s y cada borrador lo renueva. La sesión \texttt{sesion:\{anotador\}} guarda tarea, proyecto, etapa y token, el borrador vive en \texttt{borrador:\{tarea\}} y \texttt{editando:\{proyecto\}} es un conjunto ordenado con las sesiones activas. El borrador nunca es la fuente de verdad de la anotación confirmada.
+
+En la prueba P3 (\url{evidence/p3-vencimiento-candado-20261108T023448Z.txt}) se interrumpió la sesión y el borrador recuperado tenía 0.012 s de antigüedad, bajo el límite de cinco segundos. Después se dejó vencer el candado esperando 121 s. La siguiente solicitud volvió a ofrecer la misma tarea con un token nuevo, el token anterior recibió 409 al intentar guardar y la tarea no quedó con dos dueños.
+
+En P8 de Valkey (\url{evidence/p8-fallas-valkey-20261108T022433Z.txt}) se interrumpió el cliente con el borrador guardado y luego se reinició Valkey. Con \texttt{appendonly yes} y \texttt{appendfsync everysec}, la recuperación posterior devolvió el mismo borrador 2.860 s después del reinicio. Con \texttt{everysec} se puede perder como máximo cerca de un segundo de escrituras si el proceso cae sin cerrar, lo cual no afecta el estado confirmado porque este vive en MongoDB.
+
+\section{Datalake Parquet}
+
+El historial recibe los eventos por HTTP, los guarda primero en SQLite con \texttt{event\_id} como clave única y, al acumular 10\,000 pendientes o al recibir \texttt{/flush}, los agrupa por mes y escribe un micro-lote por partición en \texttt{datalake/eventos/mes=AAAA-MM/}. Cada archivo se escribe con extensión \texttt{.tmp} y se publica con \texttt{os.replace}, que es atómico dentro del mismo sistema de archivos, por lo que Spark nunca ve un archivo a medias. El nombre usa un identificador del micro-lote y la compresión es Snappy.
+
+Como cada flush agrega archivos nuevos por mes, el historial ofrece \texttt{POST /compactar}, que fusiona los micro-lotes de cada partición en un solo archivo. La compactación lee los archivos de la partición, descarta filas repetidas por \texttt{event\_id}, escribe el resultado como \texttt{.tmp}, lo publica con \texttt{os.replace} y solo después borra los originales, de modo que la partición nunca queda vacía ni expone un archivo a medias. En la prueba (\url{evidence/p4-compactacion-20261125T051012Z.json}) el datalake pasó de 223 archivos a 13, uno por mes, y Spark contó 166\,008 eventos únicos antes y después. Como la caché de Spark puede volver a leer archivos borrados si se expulsa de memoria, después de compactar se ejecuta \texttt{POST /actualizar} en la analítica.
+
+La deduplicación ocurre en dos niveles. El historial descarta un evento cuyo \texttt{event\_id} ya existe y Spark aplica \texttt{dropDuplicates(['event\_id'])} al leer. En la prueba P4 se reprocesó el micro-lote de la tarea LiDAR reenviando sus 8 eventos, los 8 se marcaron como duplicados y el total del historial siguió en 166\,008. En Parquet la tarea quedó con 8 filas y 8 \texttt{event\_id} distintos.
+
+La fila rechazada quedó como exige el enunciado. Tras el rechazo, MongoDB mostraba la tarea en \texttt{disponible} con versión 4 y Parquet contenía las filas \texttt{abierta}, \texttt{anotada}, \texttt{en\_revision} y \texttt{rechazada}, esta última con su motivo. Entre el HTTP 200 de la aprobación y la tarea visible en Q1 pasaron 13.08 s, de los cuales 10.56 s corresponden a \texttt{POST /actualizar}, que vuelve a leer y deduplicar el datalake en Spark. La frescura depende entonces de forzar el flush y la recarga, y no de un proceso continuo.
+
+El envío de eventos del gateway al historial es asíncrono y de mejor esfuerzo. Si el historial no responde, el gateway registra una advertencia y el evento no se reintenta. Esto evita que una caída del historial bloquee la operación, pero puede dejar huecos en el datalake.
+
+\section{Consultas Q1 a Q5 con Spark}
+
+Las consultas se definieron así. Q1 cuenta tareas aprobadas por día y modalidad en los 90 días previos al evento más reciente. Q2 calcula la proporción de aprobadas sobre revisadas por equipo y mes. Q3 calcula la duración media y el p95 de \texttt{duracion\_seg} de los eventos \texttt{anotada} por modalidad y tipo de tarea. Q4 calcula la proporción de rechazadas sobre revisadas por cliente y proyecto, a partir de las filas \texttt{rechazada}. Q5 calcula p50 y p95 del tiempo entre la toma (\texttt{abierta}) y la aprobación por cliente, y el porcentaje que superó su SLA.
+
+La validación con datos controlados pasó 28 de 28 casos con resultados conocidos (\texttt{evidence/validacion\_analitica.txt}).
+
+La Tabla~\ref{tab:spark} separa la primera ejecución de las posteriores sobre 976\,087 eventos únicos con \texttt{local[1]} (\texttt{evidence/pruebas.txt}). La preparación del dataset, que lee y deduplica todo el datalake y lo deja en caché \texttt{MEMORY\_AND\_DISK}, tardó 215.67 s y domina el costo. La primera ejecución de cada consulta es entre 1.5 y 2.5 veces más lenta que el promedio de las cinco siguientes, por la compilación del plan y el arranque de tareas.
+
+\begin{table}[!t]
+\caption{Tiempos de Q1 a Q5 en segundos, \texttt{local[1]}, 976\,087 eventos (\texttt{pruebas.txt}).}
+\label{tab:spark}
+\centering\footnotesize
+\begin{tabular}{@{}l r r r@{}}
+\toprule
+\textbf{Consulta} & \textbf{Primera} & \textbf{Promedio de 5 posteriores} & \textbf{Filas} \\
+\midrule
+Q1 & 4.837 & 1.955 & 307 \\
+Q2 & 5.927 & 2.692 & 390 \\
+Q3 & 2.257 & 0.965 & 5 \\
+Q4 & 3.123 & 2.056 & 120 \\
+Q5 & 4.835 & 2.390 & 60 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+La comparación entre uno y dos trabajadores (\texttt{evidence/benchmark\_analitica.txt}) se hizo con Spark en WSL Ubuntu y Java 17, fuera de Docker. Con \texttt{local[2]} la preparación bajó de 227.35 s a 134.74 s y la suma de promedios de Q1 a Q5 bajó de 15.379 s a 7.715 s (Tabla~\ref{tab:workers}). Q5 es la que más mejora porque une aperturas con aprobaciones y reparte ese trabajo. Q1 casi no cambia porque filtra pocas filas desde la caché. El Q5 con \texttt{local[1]} fue 6.607 s en esta corrida y 2.390 s en la de la Tabla~\ref{tab:spark}, lo que muestra una variabilidad alta entre corridas en la misma clase de máquina y obliga a leer estas cifras como indicativas. El servicio en Docker usa \texttt{local[1]}.
+
+\begin{table}[!t]
+\caption{Uno contra dos trabajadores, promedio de ejecuciones posteriores en s (\texttt{benchmark\_analitica.txt}).}
+\label{tab:workers}
+\centering\footnotesize
+\begin{tabular}{@{}l r r r@{}}
+\toprule
+\textbf{Consulta} & \texttt{local[1]} & \texttt{local[2]} & \textbf{Aceleración} \\
+\midrule
+Q1 & 1.361 & 1.332 & 1.02 \\
+Q2 & 2.684 & 2.045 & 1.31 \\
+Q3 & 1.313 & 0.816 & 1.61 \\
+Q4 & 2.414 & 1.580 & 1.53 \\
+Q5 & 6.607 & 1.941 & 3.40 \\
+Preparación & 227.35 & 134.74 & 1.69 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Para tener una comparación dentro del contenedor y en la misma máquina, se repitió la medición en Docker con el datalake de 166\,008 eventos de la integración final (\url{evidence/p5-workers-docker-20261125T052051Z.json}, script \texttt{pruebas/p5\_workers\_docker.py}). El script recrea la analítica con \texttt{SPARK\_WORKERS=1} y luego con 2, mide el tiempo hasta que \texttt{/salud} queda operativo, que incluye leer, deduplicar y cachear el datalake, y ejecuta cada consulta una vez y cinco veces más (Tabla~\ref{tab:docker}).
+
+\begin{table}[!t]
+\caption{Uno contra dos trabajadores en Docker, 166\,008 eventos, tiempos del servicio en s (\texttt{p5-workers-docker-20261125T052051Z.json}).}
+\label{tab:docker}
+\centering\footnotesize
+\begin{tabular}{@{}l r r r r@{}}
+\toprule
+& \multicolumn{2}{c}{\texttt{local[1]}} & \multicolumn{2}{c}{\texttt{local[2]}} \\
+\textbf{Consulta} & primera & posterior & primera & posterior \\
+\midrule
+Q1 & 1.245 & 0.378 & 1.224 & 0.394 \\
+Q2 & 1.080 & 0.464 & 1.035 & 0.412 \\
+Q3 & 0.360 & 0.186 & 0.417 & 0.188 \\
+Q4 & 0.497 & 0.357 & 0.497 & 0.333 \\
+Q5 & 0.862 & 0.423 & 0.727 & 0.400 \\
+Arranque & \multicolumn{2}{c}{10.17} & \multicolumn{2}{c}{9.12} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Con este volumen la primera ejecución sigue siendo entre 1.4 y 3.3 veces más lenta que las posteriores, pero dos trabajadores no producen una mejora clara. Las diferencias en las ejecuciones posteriores van de $-4$~\% a $+11$~\% y Q1 incluso empeora levemente, lo que está dentro de la variación entre corridas. Con 166\,008 eventos en caché cada consulta procesa poco trabajo y domina el costo fijo de planificar y coordinar tareas, mientras que con 976\,087 eventos la ganancia sí aparece, sobre todo en Q5. La conclusión es que el beneficio del segundo trabajador depende del volumen y que con el conjunto pequeño no se puede afirmar una mejora. Una primera corrida del mismo script (\texttt{p5-workers-docker-20261125T051837Z.json}) quedó con \texttt{local[1]} en ambos bloques por un error de configuración del compose y se descarta.
+
+Los planes de Q1 y Q3 se obtuvieron con \texttt{explain(mode="formatted")} (\texttt{evidence/plan\_q1.json} y \texttt{evidence/plan\_q3.json}). En ambos, la lectura parte de un \texttt{InMemoryTableScan} sobre la relación en caché, que a su vez proviene de un \texttt{Scan parquet} y de un \texttt{SortAggregate} por \texttt{event\_id} que implementa la deduplicación. En Q1 el filtro \texttt{estado = aprobada} y \texttt{event\_ts >= fecha\_max - 90 días} se aplica sobre la caché, y no como poda de particiones por \texttt{mes}, porque la caché ya contiene todas las particiones. La agrupación ocurre en cuatro \texttt{HashAggregate}, dos para eliminar tareas repetidas por la llave (día, modalidad, tarea) y dos para el \texttt{count(distinct tarea\_id)} parcial y final, con un \texttt{Exchange} por \texttt{hashpartitioning} entre cada fase. En Q3 la agregación usa \texttt{ObjectHashAggregate} porque \texttt{percentile\_approx} mantiene un búfer por grupo, y el p95 que reporta es aproximado con precisión 10\,000. El ordenamiento final de ambas requiere un \texttt{Exchange} por \texttt{rangepartitioning} seguido de \texttt{Sort}, que en Q3 es barato porque solo hay 5 grupos.
+
+Las limitaciones de Spark en este entorno son que corre en modo local dentro de un contenedor y no como clúster, que la comparación con el conjunto grande se hizo fuera de Docker, que dentro de Docker solo se comparó con 166\,008 eventos y que el conjunto ampliado de hasta diez millones de eventos no se generó. La ruta \texttt{GET /analitica/\{q\}?conjunto=ampliado} responde 501 y solo se presentan resultados sobre el conjunto principal.
+
+Hay una diferencia de volumen que se declara. El generador produce 800\,000 eventos para 100\,000 tareas, según la ejecución documentada en el README del repositorio, que no tiene archivo propio en \texttt{evidence/}. El benchmark registra 976\,087 eventos únicos, lo que indica que el datalake de esa máquina contenía eventos de más de una ejecución con identificadores distintos. La causa exacta no quedó registrada. En la máquina usada para la integración final se cargaron 166\,008 eventos, porque la generación completa no cabía en el tiempo disponible.
+
+\section{Resultados de carga y cuellos de botella}
+
+La prueba P6 simuló 10, 40 y 100 usuarios virtuales con 30 s de calentamiento y tres corridas de 90 s por nivel, en una máquina con Docker 29.7.2, 12 CPU lógicas y 7.39 GiB para Docker (cabecera de los archivos \texttt{docker-stats}). No hubo errores en ninguna corrida. La Tabla~\ref{tab:carga} muestra el promedio de las tres corridas.
+
+\begin{table}[!t]
+\caption{Carga P6, promedio de 3 corridas de 90 s, n es el total de muestras de las tres corridas y las latencias son el promedio de los percentiles de cada corrida, en ms. Envíos por minuto 143.1, 569.3 y 707.6; 0 errores (\texttt{p6-\{10,40,100\}-*.json}).}
+\label{tab:carga}
+\centering\scriptsize
+\begin{tabular}{@{}l l r r r r@{}}
+\toprule
+\textbf{VU} & \textbf{Endpoint} & \textbf{n} & \textbf{p50} & \textbf{p95} & \textbf{p99} \\
+\midrule
+10 & siguiente & 646 & 35.1 & 57.9 & 75.8 \\
+ & borrador & 1279 & 54.5 & 99.4 & 273.8 \\
+ & enviar & 644 & 54.2 & 90.2 & 151.8 \\
+ & revision & 1291 & 29.1 & 46.1 & 65.5 \\
+ & exportar & 646 & 18.2 & 32.8 & 41.2 \\
+\addlinespace
+40 & siguiente & 2562 & 32.7 & 99.5 & 160.6 \\
+ & borrador & 5105 & 36.5 & 118.4 & 206.0 \\
+ & enviar & 2562 & 39.4 & 128.5 & 210.0 \\
+ & revision & 5125 & 23.5 & 70.6 & 111.5 \\
+ & exportar & 2562 & 14.9 & 49.6 & 78.9 \\
+\addlinespace
+100 & siguiente & 3321 & 781.5 & 1086.7 & 1343.5 \\
+ & borrador & 6467 & 670.4 & 1836.2 & 2276.7 \\
+ & enviar & 3184 & 1326.3 & 1691.0 & 2206.8 \\
+ & revision & 6448 & 587.6 & 703.4 & 820.7 \\
+ & exportar & 3273 & 468.4 & 579.6 & 674.2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+De 10 a 40 usuarios los envíos por minuto crecen casi cuatro veces y las medianas no empeoran. De 40 a 100 los envíos solo crecen 24~\% y las medianas se multiplican por más de 20, lo que indica saturación. En \texttt{docker stats} con 100 usuarios, el gateway promedió 100.7~\% de CPU (máximo 111.8~\%), frente a 53.1~\% con 40 usuarios, mientras que \texttt{mongo1}, el primario, promedió 53.1~\% con picos de 165.1~\% y Valkey se mantuvo en 3.9~\%. El gateway corre como un solo proceso de Python, de modo que con 100 usuarios queda limitado a cerca de un núcleo y se convierte en el primer cuello de botella, seguido por el primario de MongoDB, que recibe todas las escrituras con \texttt{w:"majority"}. Valkey no es una limitación a estos niveles. Estas conclusiones valen para esta máquina y estos límites de Docker.
+
+\section{Fallas, RTO y RPO}
+
+La prueba P8 de MongoDB (\texttt{evidence/p8-fallas-mongo.json}) envió asignaciones de forma continua mientras se detenía con \texttt{docker stop -t 0} un secundario, luego el primario y luego dos nodos, y restauró cada vez el estado conocido. El RTO se midió como la pausa máxima entre dos respuestas 200 consecutivas y el RPO como las tareas confirmadas con 200 que no aparecen en MongoDB al final.
+
+\begin{table}[!t]
+\caption{Fallas de MongoDB. A cae un secundario, B cae el primario, C caen dos nodos (\texttt{p8-fallas-mongo.json}).}
+\label{tab:p8}
+\centering\footnotesize
+\begin{tabular}{@{}l r r r@{}}
+\toprule
+& \textbf{A} & \textbf{B} & \textbf{C} \\
+\midrule
+200 durante la falla & 128 & 331 & 0 \\
+503 durante la falla & 0 & 0 & 10 \\
+Nuevo primario & no & sí & no \\
+Pausa máxima entre 200 (s) & 0.15 & 0.26 & 31.63 \\
+Pausa típica (s) & 0.125 & 0.124 & 0.126 \\
+Confirmadas con 200 & 244 & 424 & 103 \\
+Confirmadas ausentes & 0 & 0 & 0 \\
+Duplicadas & 0 & 0 & 0 \\
+Abiertas sin 200 & 0 & 0 & 4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Con un nodo caído el sistema siguió escribiendo porque quedan dos de tres nodos y hay mayoría para confirmar con \texttt{w:"majority"}. Al caer el primario se eligió otro y la pausa máxima fue 0.26 s frente a 0.124 s típicos. Con dos nodos caídos no hay mayoría, ningún nodo puede ser primario y el gateway devolvió 503 sin reintentar, como pide el enunciado. La escritura se reanudó 5.23 s después de restaurar los nodos. En los tres escenarios todas las tareas confirmadas con 200 siguieron en MongoDB una sola vez, de modo que el RPO observado fue cero.
+
+En el escenario C quedaron 4 tareas en estado \texttt{abierta} sin que el cliente recibiera un 200. Un error o un tiempo de espera no prueba que el dato no se escribió, solo que el cliente no recibió la confirmación. Esas tareas no cuentan como pérdida porque no se confirmaron, y vuelven a ofrecerse cuando vence su plazo.
+
+La falla de Valkey y la interrupción de sesión se describieron en la sección III, con el borrador conservado tras el reinicio. La salud por capa se verificó en tres estados para el registro (\texttt{evidence/p1-salud-registro.json}), con \texttt{operativo} y 200 con tres nodos, \texttt{degradado} y 200 con dos, y \texttt{caido} y 503 sin primario. El gateway agrega la salud de las cuatro capas sin depender de ellas para responder (\texttt{evidence/p1-salud-gateway.txt}). Con todo arriba respondió \texttt{operativo}, con el historial detenido respondió \texttt{degradado} marcando solo esa capa como \texttt{caido}, y con las cuatro capas detenidas respondió \texttt{caido} con HTTP 503.
+
+\section{Limitaciones}
+
+La compactación se ejecuta a pedido y no de forma periódica. El conjunto ampliado no se generó y su ruta responde 501. Solo la capa de sesión publica su estado en Valkey, y las demás capas reportan salud únicamente por HTTP. El envío de eventos al historial es de mejor esfuerzo y no se reintenta. La frescura hasta Q1 requiere flush y recarga manuales. Las pruebas se hicieron en máquinas distintas, P2 y P8 en una con 16 CPU lógicas y 63.4 GB (\texttt{evidence/machine-specs.txt}), P6 en una con 12 CPU lógicas y 7.39 GiB para Docker, y el benchmark de Spark con 976\,087 eventos en WSL fuera de Docker, sin un archivo con las características de esa máquina. La comparación de trabajadores en Docker se hizo en la máquina de 16 CPU. La diferencia entre 800\,000 y 976\,087 eventos no tiene una causa registrada. La detención con \texttt{docker stop -t 0} puede comportarse distinto de un corte de red real, que no se midió. Ninguna de las cifras permite inferir el rendimiento de un clúster repartido en varias máquinas.
+
+\appendices
+
+\section{Trazabilidad de cifras}
+
+Cada prueba se ejecuta desde \texttt{proyecto2/} con el script indicado y escribe su archivo en \texttt{evidence/}. La fecha es la que registra el propio archivo, en UTC salvo indicación. Los archivos de analítica no registran fecha. La Tabla~\ref{tab:traza} relaciona cada cifra con su archivo.
+
+\begin{table*}[!t]
+\caption{Trazabilidad de cifras, archivos, scripts y fechas.}
+\label{tab:traza}
+\centering\footnotesize
+\begin{tabularx}{\textwidth}{@{}X l l l@{}}
+\toprule
+\textbf{Cifra} & \textbf{Archivo en evidence/} & \textbf{Script} & \textbf{Fecha} \\
+\midrule
+Puertos publicados & p1-puertos.txt & p4\_recorrido\_lidar.py & 2026-11-25 \\
+Aislamiento del registro & p1-aislamiento-registro.json & p1\_aislamiento\_registro.py & 2026-11-02 \\
+Salud del registro en tres estados & p1-salud-registro.json & p1\_salud\_registro.py & 2026-11-02 \\
+Salud del gateway en tres estados & p1-salud-gateway.txt & comandos de la sección VII & 2026-11-25 \\
+Rutas del gateway y códigos HTTP & gateway-*.txt & gateway\_envio.py, sesion\_basica.py & 2026-11-04 \\
+Conteos del registro & dataset-registro-conteos.txt & dataset/cargar\_registro.sh & 2026-11-22 \\
+Índices y explain & p2-indices-explain.json & p2\_indices.py & 2026-11-02 \\
+50 contra 10, 409 & p2-concurrencia.json & p2\_concurrencia.py & 2026-11-02 \\
+\texttt{w:1} y \texttt{w:"majority"} & p2-write-concern.json & registro/scripts/bench-write-concern.js & 2026-11-02 \\
+Borrador 0.012 s, candado vencido & p3-vencimiento-candado-*.txt & p3\_vencimiento\_candado.py & 2026-11-08 \\
+Recorrido LiDAR, rechazo, 13.08 s, duplicados & p4-recorrido-lidar-*.json & p4\_recorrido\_lidar.py & 2026-11-25 \\
+Compactación de 223 a 13 archivos & p4-compactacion-*.json & p4\_compactacion.py & 2026-11-25 \\
+Validación 28/28 & validacion\_analitica.txt & analitica\_controlada.py & no registrada \\
+Tiempos de Q1 a Q5 & pruebas.txt & analitica\_controlada.py benchmark & no registrada \\
+Uno contra dos trabajadores, WSL & benchmark\_analitica.txt & analitica\_controlada.py & no registrada \\
+Uno contra dos trabajadores, Docker & p5-workers-docker-*052051Z.json & p5\_workers\_docker.py & 2026-11-25 \\
+Planes de Q1 y Q3 & plan\_q1.json, plan\_q3.json & GET /q1/plan y /q3/plan & 2026-11-25 \\
+Carga P6 y CPU por contenedor & p6-\{10,40,100\}-*.json y *-docker-stats.txt & simulador/carga.py & 2026-11-07 y 08 \\
+Fallas de MongoDB, RTO y RPO & p8-fallas-mongo.json & p8\_fallas\_mongo.py & 2026-11-02 \\
+Reinicio de Valkey & p8-fallas-valkey-*.txt & p8\_fallas\_valkey.py & 2026-11-08 \\
+Máquina de P2 y P8 & machine-specs.txt & manual & 2026-11-02 \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\section{Cómo reproducir}
+
+Desde \texttt{proyecto2/}, en una máquina con Docker y Python 3.11, \texttt{bash scripts/setup.sh} levanta MongoDB en réplica, crea colecciones e índices y levanta registro, sesión, historial, analítica y gateway. La carga de datos del registro y del historial está en \texttt{datos/README.md}. Cada prueba se ejecuta con su script en \texttt{pruebas/} y escribe su archivo en \texttt{evidence/}. El README incluye requisitos previos, comandos de inicio y detención, y solución de problemas.
+
+\section{Roles del equipo}
+
+Henry Núñez Pérez implementó el registro en MongoDB, el conjunto de réplicas, los índices, el generador y la carga del registro, las pruebas P1 y P2 del registro y P8 de MongoDB, la integración final del gateway con historial y analítica, la compactación del datalake y las pruebas P4 del recorrido LiDAR y de compactación y P5 de trabajadores en Docker. Nicol Otárola Porras implementó el gateway, el servicio de sesión con Valkey, el simulador de carga y las pruebas P3, P6 y P8 de Valkey. Giancarlo Vega Marín implementó el historial con Parquet, el generador del historial, el servicio de analítica con Spark, las consultas Q1 a Q5, su validación y el benchmark de trabajadores.
+
+\end{document}

@@ -1,4 +1,4 @@
-P1 puertos publicados 2026-11-25T04:56:30.898780+00:00
+P1 puertos publicados 2026-11-25T05:26:37.602481+00:00
 NAME                  PORTS
 analitica             127.0.0.1:8004->8004/tcp
 historial             127.0.0.1:8003->8003/tcp
