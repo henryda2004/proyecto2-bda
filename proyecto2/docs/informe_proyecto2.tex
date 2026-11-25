@@ -9,7 +9,7 @@
 \usepackage{url}
 \makeatletter\g@addto@macro\UrlBreaks{\do\-\do\_}\makeatother
 \usepackage{tikz}
-\usetikzlibrary{positioning,arrows.meta}
+\usetikzlibrary{positioning,arrows.meta,calc}
 
 \setlength{\tabcolsep}{3.5pt}
 \begin{document}
@@ -56,7 +56,7 @@ El registro es la única fuente de verdad del estado vigente de una tarea y es e
 \draw[a] (sim) -- node[right,font=\scriptsize]{HTTP} (gw);
 \draw[a] (gw) -- (reg); \draw[a] (gw) -- (ses); \draw[a] (gw) -- (his); \draw[a] (gw) -- (an);
 \draw[a] (reg) -- (mon); \draw[a] (ses) -- (val); \draw[a] (his) -- (pq);
-\draw[a, dashed] (an.east) -- ++(0.35,0) |- node[pos=0.25,left,font=\scriptsize,align=right]{solo\\lectura} (pq.east);
+\draw[a, dashed] (an.east) -- ($(an.east -| pq.east)+(0.3,0)$) |- node[pos=0.25,sloped,above,font=\scriptsize]{solo lectura} (pq.east);
 \end{tikzpicture}
 \caption{Servicios y almacenamientos. Solo el gateway recibe tráfico del simulador.}
 \label{fig:arq}
