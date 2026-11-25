@@ -1,0 +1,141 @@
+{
+  "fecha_hora_utc": "2026-11-25T05:10:12.612394+00:00",
+  "objetivo": "Fusionar los micro-lotes de cada particion mes=AAAA-MM sin perder ni duplicar eventos y sin exponer archivos a medias.",
+  "comando": "python pruebas/p4_compactacion.py",
+  "antes": {
+    "archivos_por_particion": {
+      "mes=2025-11": 17,
+      "mes=2025-12": 17,
+      "mes=2026-01": 17,
+      "mes=2026-02": 17,
+      "mes=2026-03": 17,
+      "mes=2026-04": 17,
+      "mes=2026-05": 17,
+      "mes=2026-06": 17,
+      "mes=2026-07": 17,
+      "mes=2026-08": 17,
+      "mes=2026-09": 17,
+      "mes=2026-10": 17,
+      "mes=2026-11": 19
+    },
+    "archivos_total": 223,
+    "eventos_unicos_spark": 166008
+  },
+  "compactacion_http": 200,
+  "compactacion": {
+    "mensaje": "Compactacion completada",
+    "particiones": [
+      {
+        "particion": "mes=2025-11",
+        "archivos_entrada": 17,
+        "filas_entrada": 224,
+        "filas_salida": 224,
+        "archivo_salida": "/datalake/eventos/mes=2025-11/compactado_d92aedfa07ac4035.parquet"
+      },
+      {
+        "particion": "mes=2025-12",
+        "archivos_entrada": 17,
+        "filas_entrada": 1852,
+        "filas_salida": 1852,
+        "archivo_salida": "/datalake/eventos/mes=2025-12/compactado_51ebfcf2f1494b3b.parquet"
+      },
+      {
+        "particion": "mes=2026-01",
+        "archivos_entrada": 17,
+        "filas_entrada": 4171,
+        "filas_salida": 4171,
+        "archivo_salida": "/datalake/eventos/mes=2026-01/compactado_4bd14135dacd4460.parquet"
+      },
+      {
+        "particion": "mes=2026-02",
+        "archivos_entrada": 17,
+        "filas_entrada": 4882,
+        "filas_salida": 4882,
+        "archivo_salida": "/datalake/eventos/mes=2026-02/compactado_5c31ea3769e44ecf.parquet"
+      },
+      {
+        "particion": "mes=2026-03",
+        "archivos_entrada": 17,
+        "filas_entrada": 7604,
+        "filas_salida": 7604,
+        "archivo_salida": "/datalake/eventos/mes=2026-03/compactado_b4c8d584e8d940f2.parquet"
+      },
+      {
+        "particion": "mes=2026-04",
+        "archivos_entrada": 17,
+        "filas_entrada": 9437,
+        "filas_salida": 9437,
+        "archivo_salida": "/datalake/eventos/mes=2026-04/compactado_17d4ef935aac47fc.parquet"
+      },
+      {
+        "particion": "mes=2026-05",
+        "archivos_entrada": 17,
+        "filas_entrada": 13542,
+        "filas_salida": 13542,
+        "archivo_salida": "/datalake/eventos/mes=2026-05/compactado_a056def39f4f47c1.parquet"
+      },
+      {
+        "particion": "mes=2026-06",
+        "archivos_entrada": 17,
+        "filas_entrada": 15261,
+        "filas_salida": 15261,
+        "archivo_salida": "/datalake/eventos/mes=2026-06/compactado_93c581bcc2404c57.parquet"
+      },
+      {
+        "particion": "mes=2026-07",
+        "archivos_entrada": 17,
+        "filas_entrada": 19967,
+        "filas_salida": 19967,
+        "archivo_salida": "/datalake/eventos/mes=2026-07/compactado_5d6d8366b1d8473d.parquet"
+      },
+      {
+        "particion": "mes=2026-08",
+        "archivos_entrada": 17,
+        "filas_entrada": 25720,
+        "filas_salida": 25720,
+        "archivo_salida": "/datalake/eventos/mes=2026-08/compactado_98962b6aa50743f8.parquet"
+      },
+      {
+        "particion": "mes=2026-09",
+        "archivos_entrada": 17,
+        "filas_entrada": 31393,
+        "filas_salida": 31393,
+        "archivo_salida": "/datalake/eventos/mes=2026-09/compactado_0aa19e88dada4492.parquet"
+      },
+      {
+        "particion": "mes=2026-10",
+        "archivos_entrada": 17,
+        "filas_entrada": 31667,
+        "filas_salida": 31667,
+        "archivo_salida": "/datalake/eventos/mes=2026-10/compactado_e9ef00d9a42e4a75.parquet"
+      },
+      {
+        "particion": "mes=2026-11",
+        "archivos_entrada": 19,
+        "filas_entrada": 288,
+        "filas_salida": 288,
+        "archivo_salida": "/datalake/eventos/mes=2026-11/compactado_540e5e54f2974133.parquet"
+      }
+    ]
+  },
+  "despues": {
+    "archivos_por_particion": {
+      "mes=2025-11": 1,
+      "mes=2025-12": 1,
+      "mes=2026-01": 1,
+      "mes=2026-02": 1,
+      "mes=2026-03": 1,
+      "mes=2026-04": 1,
+      "mes=2026-05": 1,
+      "mes=2026-06": 1,
+      "mes=2026-07": 1,
+      "mes=2026-08": 1,
+      "mes=2026-09": 1,
+      "mes=2026-10": 1,
+      "mes=2026-11": 1
+    },
+    "archivos_total": 13,
+    "eventos_unicos_spark": 166008
+  },
+  "prueba_superada": true
+}

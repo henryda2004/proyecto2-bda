@@ -153,3 +153,80 @@ def flush():
         "archivos": archivos,
         "mensaje": "Flush completado",
     }
+
+
+# ---------------------------------------------------------------------
+# Compactacion
+# ---------------------------------------------------------------------
+
+import threading
+import uuid
+
+_COMPACTANDO = threading.Lock()
+
+
+def compactar(minimo_archivos: int = 2) -> dict:
+    """
+    Fusiona los micro-lotes de cada particion mes=AAAA-MM en un solo archivo.
+
+    Se leen los archivos existentes, se eliminan filas repetidas por event_id,
+    se escribe el resultado en un .tmp y se publica con os.replace, igual que
+    un micro-lote. Solo despues de publicar el archivo compactado se borran los
+    archivos originales, de modo que un lector nunca ve la particion sin datos
+    ni un archivo a medias. Los micro-lotes que lleguen durante la compactacion
+    no se tocan porque no estaban en la lista inicial.
+    """
+    if not _COMPACTANDO.acquire(blocking=False):
+        return {"mensaje": "Ya hay una compactacion en curso", "particiones": []}
+
+    try:
+        resumen = []
+        if not os.path.isdir(DATA_LAKE):
+            return {"mensaje": "Datalake vacio", "particiones": []}
+
+        for nombre_dir in sorted(os.listdir(DATA_LAKE)):
+            directorio = os.path.join(DATA_LAKE, nombre_dir)
+            if not (nombre_dir.startswith("mes=") and os.path.isdir(directorio)):
+                continue
+
+            archivos = sorted(
+                os.path.join(directorio, f)
+                for f in os.listdir(directorio)
+                if f.endswith(".parquet")
+            )
+            if len(archivos) < minimo_archivos:
+                continue
+
+            tablas = [pq.read_table(a, schema=SCHEMA) for a in archivos]
+            tabla = pa.concat_tables(tablas)
+            filas_entrada = tabla.num_rows
+
+            vistos = set()
+            indices = []
+            for i, event_id in enumerate(tabla.column("event_id").to_pylist()):
+                if event_id not in vistos:
+                    vistos.add(event_id)
+                    indices.append(i)
+            tabla = tabla.take(pa.array(indices, type=pa.int64()))
+
+            destino = os.path.join(
+                directorio, f"compactado_{uuid.uuid4().hex[:16]}.parquet"
+            )
+            temporal = destino + ".tmp"
+            pq.write_table(tabla, temporal, compression="snappy")
+            os.replace(temporal, destino)
+
+            for a in archivos:
+                os.remove(a)
+
+            resumen.append({
+                "particion": nombre_dir,
+                "archivos_entrada": len(archivos),
+                "filas_entrada": filas_entrada,
+                "filas_salida": tabla.num_rows,
+                "archivo_salida": destino,
+            })
+
+        return {"mensaje": "Compactacion completada", "particiones": resumen}
+    finally:
+        _COMPACTANDO.release()

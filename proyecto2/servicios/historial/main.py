@@ -218,6 +218,18 @@ def forzar_flush():
         )
 
 
+@app.post("/compactar")
+def compactar():
+    try:
+        return parquet.compactar()
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error compactando Parquet: {str(exc)}",
+        )
+
+
 @app.get("/estadisticas")
 def estadisticas():
     return db.contar_eventos()
